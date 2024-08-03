@@ -1,15 +1,12 @@
 import Link from 'next/link';
 
-import { LatestPost } from '~/app/(public)/_components/post';
 import { Button } from '~/components/ui/button';
 import { getServerAuthSession } from '~/server/auth';
 import { api, HydrateClient } from '~/trpc/server';
 
 export default async function Home() {
-  const greeting = await api.post.greeting();
+  const greeting = await api.greeting();
   const session = await getServerAuthSession();
-
-  void api.post.getLatest.prefetch();
 
   return (
     <HydrateClient>
@@ -30,8 +27,6 @@ export default async function Home() {
             </Link>
           </Button>
         </div>
-
-        {session?.user && <LatestPost />}
       </div>
     </HydrateClient>
   );
