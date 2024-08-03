@@ -11,7 +11,7 @@ import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
 import { ZodError } from 'zod';
 
-import { getServerAuthSession } from '~/server/auth';
+import { uncachedValidateRequest } from '~/libs/auth/validate-request';
 import { db } from '~/server/db';
 
 /**
@@ -27,12 +27,13 @@ import { db } from '~/server/db';
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  const session = await getServerAuthSession();
+  const { user, session } = await uncachedValidateRequest();
 
   return {
     db,
     session,
-    ...opts,
+    user,
+    headers: opts.headers,
   };
 };
 
@@ -121,13 +122,19 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
-    if (!ctx.session || !ctx.session.user) {
+    if (!ctx.user || !ctx.session) {
       throw new TRPCError({ code: 'UNAUTHORIZED' });
     }
     return next({
       ctx: {
-        // infers the `session` as non-nullable
-        session: { ...ctx.session, user: ctx.session.user },
+        session: { ...ctx.session },
+        user: { ...ctx.user },
       },
     });
   });
+
+export type TRPCContext = Awaited<ReturnType<typeof createTRPCContext>>;
+export type ProtectedTRPCContext = TRPCContext & {
+  user: NonNullable<TRPCContext['user']>;
+  session: NonNullable<TRPCContext['session']>;
+};

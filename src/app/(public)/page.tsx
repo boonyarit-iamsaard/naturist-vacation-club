@@ -1,12 +1,13 @@
 import Link from 'next/link';
 
 import { Button } from '~/components/ui/button';
-import { getServerAuthSession } from '~/server/auth';
+import { logout } from '~/libs/auth/action';
+import { validateRequest } from '~/libs/auth/validate-request';
 import { api, HydrateClient } from '~/trpc/server';
 
 export default async function Home() {
   const greeting = await api.greeting();
-  const session = await getServerAuthSession();
+  const { user } = await validateRequest();
 
   return (
     <HydrateClient>
@@ -16,16 +17,19 @@ export default async function Home() {
         </h1>
 
         <div className="flex flex-col items-center justify-center gap-4">
-          {session && (
-            <p className="text-center text-2xl">
-              Logged in as {session.user?.name}
-            </p>
+          {user ? (
+            <p className="text-center text-2xl">Logged in as {user.name}</p>
+          ) : null}
+
+          {user ? (
+            <form action={logout}>
+              <Button>Logout</Button>
+            </form>
+          ) : (
+            <Button asChild>
+              <Link href="/login">Login</Link>
+            </Button>
           )}
-          <Button asChild>
-            <Link href={session ? '/api/auth/signout' : '/api/auth/signin'}>
-              {session ? 'Sign out' : 'Sign in'}
-            </Link>
-          </Button>
         </div>
       </div>
     </HydrateClient>
