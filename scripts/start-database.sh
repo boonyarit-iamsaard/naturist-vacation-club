@@ -9,27 +9,43 @@
 
 # On Linux and macOS you can run this script directly - `./start-database.sh`
 
-DB_CONTAINER_NAME="naturist-vacation-club-postgres"
+# Import env variables from .env
+set -a
+source .env
+
+# Function to validate required environment variables
+validate_env() {
+  local missing_vars=()
+  for var in "$@"; do
+    if [ -z "${!var}" ]; then
+      missing_vars+=("$var")
+    fi
+  done
+
+  if [ ${#missing_vars[@]} -ne 0 ]; then
+    echo "Error: The following environment variables are not set: ${missing_vars[*]}"
+    exit 1
+  fi
+}
+
+# Validate required environment variables
+validate_env DB_CONTAINER_NAME DB_VOLUME_NAME DATABASE_URL
 
 if ! [ -x "$(command -v docker)" ]; then
   echo -e "Docker is not installed. Please install docker and try again.\nDocker install guide: https://docs.docker.com/engine/install/"
   exit 1
 fi
 
-if [ "$(docker ps -q -f name=$DB_CONTAINER_NAME)" ]; then
+if [ "$(docker ps -q -f name="$DB_CONTAINER_NAME")" ]; then
   echo "Database container '$DB_CONTAINER_NAME' already running"
   exit 0
 fi
 
-if [ "$(docker ps -q -a -f name=$DB_CONTAINER_NAME)" ]; then
+if [ "$(docker ps -q -a -f name="$DB_CONTAINER_NAME")" ]; then
   docker start "$DB_CONTAINER_NAME"
   echo "Existing database container '$DB_CONTAINER_NAME' started"
   exit 0
 fi
-
-# import env variables from .env
-set -a
-source .env
 
 DB_PASSWORD=$(echo "$DATABASE_URL" | awk -F':' '{print $3}' | awk -F'@' '{print $1}')
 DB_PORT=$(echo "$DATABASE_URL" | awk -F':' '{print $4}' | awk -F'\/' '{print $1}')
@@ -38,7 +54,7 @@ if [ "$DB_PASSWORD" = "password" ]; then
   echo "You are using the default database password"
   read -p "Should we generate a random password for you? [y/N]: " -r REPLY
   if ! [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo "Please change the default password in the .env file and try again"
+    echo "Please set a password in the .env file and try again"
     exit 1
   fi
   # Generate a random URL-safe password
@@ -47,9 +63,10 @@ if [ "$DB_PASSWORD" = "password" ]; then
 fi
 
 docker run -d \
-  --name $DB_CONTAINER_NAME \
+  --name "$DB_CONTAINER_NAME" \
   -e POSTGRES_USER="postgres" \
   -e POSTGRES_PASSWORD="$DB_PASSWORD" \
   -e POSTGRES_DB=naturist-vacation-club \
+  -v "$DB_VOLUME_NAME":/var/lib/postgresql/data \
   -p "$DB_PORT":5432 \
   docker.io/postgres && echo "Database container '$DB_CONTAINER_NAME' was successfully created"
