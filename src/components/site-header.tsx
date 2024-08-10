@@ -1,10 +1,16 @@
-import Link from 'next/link';
+'use client';
 
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 
 import { Button } from '~/components/ui/button';
 
 export function SiteHeader() {
+  const pathname = usePathname();
+  const isSignInPage = pathname.includes('/sign-in');
+
   return (
     <header className="sticky top-0 z-50 w-full border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
@@ -17,11 +23,13 @@ export function SiteHeader() {
           </Link>
         </div>
         <nav className="flex items-center gap-4 text-sm font-medium">
-          <SignedOut>
-            <Button asChild variant="ghost">
-              <SignInButton />
-            </Button>
-          </SignedOut>
+          {isSignInPage ? null : (
+            <SignedOut>
+              <Button asChild variant="ghost">
+                <Link href="/sign-in">Sign in</Link>
+              </Button>
+            </SignedOut>
+          )}
           <SignedIn>
             <UserButton />
           </SignedIn>
