@@ -1,14 +1,7 @@
 'use client';
 
 import { useClerk, useUser } from '@clerk/nextjs';
-import {
-  Calendar,
-  CircleUserRound,
-  CreditCard,
-  LogOut,
-  Settings,
-  User,
-} from 'lucide-react';
+import { Calendar, LogOut, User } from 'lucide-react';
 
 import { Button } from '~/components/ui/button';
 import {
