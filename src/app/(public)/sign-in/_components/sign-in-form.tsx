@@ -1,11 +1,12 @@
 'use client';
 
+import { useState, type ChangeEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { useSignIn } from '@clerk/nextjs';
+import { Loader2 } from 'lucide-react';
+import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import { Button } from '~/components/ui/button';
 import {
@@ -25,49 +26,55 @@ import {
   FormMessage,
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
-
-const signInParams = z.object({
-  identifier: z.string().email('Please enter a valid email address.'),
-  password: z.string().min(1, 'Please enter your password.'),
-});
-
-type SignInParams = z.infer<typeof signInParams>;
+import { type SignInParams } from '~/libs/auth/validators';
 
 export function SignInForm() {
-  const { isLoaded, signIn, setActive } = useSignIn();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [signInErrorMessage, setSignInErrorMessage] = useState<string | null>(
+    null,
+  );
   const router = useRouter();
   const form = useForm<SignInParams>({
     defaultValues: {
-      identifier: '',
+      email: '',
       password: '',
     },
   });
 
-  // TODO: add loading state handling
-  const onSubmit = async (values: SignInParams) => {
-    if (!isLoaded) {
+  function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
+    form.setValue('email', event.target.value);
+    form.clearErrors('email');
+    setSignInErrorMessage(null);
+  }
+
+  function handlePasswordChange(event: ChangeEvent<HTMLInputElement>) {
+    form.setValue('password', event.target.value);
+    form.clearErrors('password');
+    setSignInErrorMessage(null);
+  }
+
+  async function onSubmit(values: SignInParams) {
+    setLoading(true);
+    setSignInErrorMessage(null);
+
+    const response = await signIn('credentials', {
+      redirect: false,
+      email: values.email,
+      password: values.password,
+    });
+
+    if (!response?.ok) {
+      console.error(response?.error);
+      setSignInErrorMessage(
+        response?.error ?? 'Unable to login, please try again later',
+      );
+      setLoading(false);
       return;
     }
 
-    const { identifier, password } = values;
-    try {
-      const signInAttempt = await signIn.create({
-        identifier,
-        password,
-      });
-
-      if (signInAttempt.status === 'complete') {
-        await setActive({ session: signInAttempt.createdSessionId });
-        router.replace('/');
-      } else {
-        // TODO: improve error handling
-        console.error(JSON.stringify(signInAttempt, null, 2));
-      }
-    } catch (err: unknown) {
-      // TODO: improve error handling
-      console.error(JSON.stringify(err, null, 2));
-    }
-  };
+    setLoading(false);
+    router.replace('/');
+  }
 
   // TODO: improve form title and description
   return (
@@ -86,16 +93,18 @@ export function SignInForm() {
             <div className="grid gap-4">
               <FormField
                 control={form.control}
-                name="identifier"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
+                        {...field}
                         autoComplete="email"
                         placeholder="email@example.com"
                         type="email"
-                        {...field}
+                        value={field.value}
+                        onChange={handleEmailChange}
                       />
                     </FormControl>
                     <FormMessage />
@@ -119,9 +128,11 @@ export function SignInForm() {
                     </div>
                     <FormControl>
                       <Input
+                        {...field}
                         autoComplete="current-password"
                         type="password"
-                        {...field}
+                        value={field.value}
+                        onChange={handlePasswordChange}
                       />
                     </FormControl>
                     <FormMessage />
@@ -129,10 +140,19 @@ export function SignInForm() {
                 )}
               />
             </div>
+
+            {signInErrorMessage ? (
+              <div className="mt-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-2 text-center text-sm text-destructive">
+                {signInErrorMessage}
+              </div>
+            ) : null}
           </CardContent>
           <CardFooter className="md:p-8 md:pt-0">
             <Button type="submit" className="w-full">
-              Login
+              {loading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              Sign in
             </Button>
           </CardFooter>
         </Card>

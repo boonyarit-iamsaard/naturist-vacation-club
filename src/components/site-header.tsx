@@ -3,13 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { SignedIn, SignedOut } from '@clerk/nextjs';
+import { useSession } from 'next-auth/react';
 
 import { ProfileButton } from '~/components/profile-button';
 import { Button } from '~/components/ui/button';
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const { status } = useSession();
+
+  const authenticated = status === 'authenticated';
   const isSignInPage = pathname.includes('/sign-in');
 
   return (
@@ -24,16 +27,12 @@ export function SiteHeader() {
           </Link>
         </div>
         <nav className="flex items-center gap-4 text-sm font-medium">
-          {isSignInPage ? null : (
-            <SignedOut>
-              <Button asChild variant="ghost" className="h-8 px-2 py-1.5">
-                <Link href="/sign-in">Sign in</Link>
-              </Button>
-            </SignedOut>
+          {isSignInPage || authenticated ? null : (
+            <Button asChild variant="ghost" className="h-8 px-2 py-1.5">
+              <Link href="/sign-in">Sign in</Link>
+            </Button>
           )}
-          <SignedIn>
-            <ProfileButton />
-          </SignedIn>
+          {authenticated ? <ProfileButton /> : null}
         </nav>
       </div>
     </header>

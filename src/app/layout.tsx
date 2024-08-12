@@ -3,8 +3,7 @@ import '~/styles/globals.css';
 import { type ReactNode } from 'react';
 import { type Metadata } from 'next';
 
-import { ClerkProvider } from '@clerk/nextjs';
-
+import { NextAuthProvider } from '~/app/providers/next-auth-provider';
 import { cn } from '~/libs/utils/cn';
 import { fontSans } from '~/libs/utils/fonts';
 import { TRPCReactProvider } from '~/trpc/react';
@@ -21,19 +20,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={cn(
-            'min-h-screen bg-background font-sans antialiased',
-            fontSans.variable,
-          )}
-        >
-          <div className="relative flex min-h-screen flex-col bg-background">
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={cn(
+          'min-h-screen bg-background font-sans antialiased',
+          fontSans.variable,
+        )}
+      >
+        <div className="relative flex min-h-screen flex-col bg-background">
+          <NextAuthProvider>
             <TRPCReactProvider>{children}</TRPCReactProvider>
-          </div>
-        </body>
-      </html>
-    </ClerkProvider>
+          </NextAuthProvider>
+        </div>
+      </body>
+    </html>
   );
 }

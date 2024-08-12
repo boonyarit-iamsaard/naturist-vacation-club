@@ -1,7 +1,9 @@
 'use client';
 
-import { useClerk, useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
+
 import { Calendar, LogOut, User } from 'lucide-react';
+import { signOut, useSession } from 'next-auth/react';
 
 import { Button } from '~/components/ui/button';
 import {
@@ -16,12 +18,17 @@ import {
 import { Skeleton } from '~/components/ui/skeleton';
 
 export function ProfileButton() {
-  const { signOut } = useClerk();
-  const { isLoaded, isSignedIn, user } = useUser();
+  const router = useRouter();
+  const { data, status } = useSession();
 
-  const handleSignOut = async () => {
-    await signOut({ redirectUrl: '/' });
-  };
+  async function handleSignOut() {
+    const response = await signOut({
+      redirect: false,
+      callbackUrl: '/sign-in',
+    });
+
+    router.push(response.url);
+  }
 
   return (
     <DropdownMenu>
@@ -35,15 +42,15 @@ export function ProfileButton() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuLabel className="flex flex-col">
-          {isLoaded && isSignedIn ? (
+          {status === 'loading' ? (
+            <Skeleton className="h-9" />
+          ) : (
             <>
-              <span>{user.fullName}</span>
+              <span>{data?.user.name}</span>
               <span className="text-xs font-normal text-muted-foreground">
-                {user.primaryEmailAddress?.emailAddress}
+                {data?.user.email}
               </span>
             </>
-          ) : (
-            <Skeleton className="h-9" />
           )}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
