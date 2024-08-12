@@ -1,11 +1,10 @@
 name: Seed database
 on:
   workflow_run:
-    workflows: ['Deploy database migrations']
+    workflows:
+      - 'Deploy database changes'
     types:
       - completed
-    branches:
-      - main
 
 jobs:
   seed:
