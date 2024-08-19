@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
-import { Calendar, LogOut, User } from 'lucide-react';
+import { Calendar, LogOut, ShieldCheckIcon, User } from 'lucide-react';
 import { signOut, useSession } from 'next-auth/react';
 
 import { Button } from '~/components/ui/button';
@@ -42,16 +42,15 @@ export function ProfileButton() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuLabel className="flex flex-col">
-          {status === 'loading' ? (
-            <Skeleton className="h-9" />
-          ) : (
+          {status === 'loading' ? <Skeleton className="h-9" /> : null}
+          {status === 'authenticated' ? (
             <>
               <span>{data?.user.name}</span>
               <span className="text-xs font-normal text-muted-foreground">
                 {data?.user.email}
               </span>
             </>
-          )}
+          ) : null}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
@@ -63,6 +62,12 @@ export function ProfileButton() {
             <Calendar className="mr-2 h-4 w-4" />
             <span>Bookings</span>
           </DropdownMenuItem>
+          {data?.user.role === 'ADMIN' ? (
+            <DropdownMenuItem>
+              <ShieldCheckIcon className="mr-2 h-4 w-4" />
+              <span>Admin</span>
+            </DropdownMenuItem>
+          ) : null}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
