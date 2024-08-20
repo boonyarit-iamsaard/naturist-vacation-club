@@ -114,7 +114,7 @@ export const authOptions: NextAuthOptions = {
         // non-existent user error?
         const user = await db.user.findUnique({
           where: {
-            email: result.data.email,
+            email: result.data.identifier,
           },
         });
         if (!user) {
