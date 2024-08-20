@@ -1,9 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
+import { useClerk, useUser } from '@clerk/nextjs';
 import { Calendar, LogOut, ShieldCheckIcon, User } from 'lucide-react';
-import { signOut, useSession } from 'next-auth/react';
 
 import { Button } from '~/components/ui/button';
 import {
@@ -17,17 +15,16 @@ import {
 } from '~/components/ui/dropdown-menu';
 import { Skeleton } from '~/components/ui/skeleton';
 
-export function ProfileButton() {
-  const router = useRouter();
-  const { data, status } = useSession();
+type ProfileButtonProps = {
+  role?: CustomJwtSessionClaims['metadata']['role'];
+};
+
+export function ProfileButton({ role }: Readonly<ProfileButtonProps>) {
+  const { signOut } = useClerk();
+  const { isSignedIn, user, isLoaded } = useUser();
 
   async function handleSignOut() {
-    const response = await signOut({
-      redirect: false,
-      callbackUrl: '/sign-in',
-    });
-
-    router.push(response.url);
+    await signOut({ redirectUrl: '/' });
   }
 
   return (
@@ -42,12 +39,12 @@ export function ProfileButton() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuLabel className="flex flex-col">
-          {status === 'loading' ? <Skeleton className="h-9" /> : null}
-          {status === 'authenticated' ? (
+          {!isLoaded ? <Skeleton className="h-9" /> : null}
+          {isSignedIn ? (
             <>
-              <span>{data?.user.name}</span>
+              <span>{user?.fullName}</span>
               <span className="text-xs font-normal text-muted-foreground">
-                {data?.user.email}
+                {user?.primaryEmailAddress?.emailAddress}
               </span>
             </>
           ) : null}
@@ -62,7 +59,7 @@ export function ProfileButton() {
             <Calendar className="mr-2 h-4 w-4" />
             <span>Bookings</span>
           </DropdownMenuItem>
-          {data?.user.role === 'ADMIN' ? (
+          {role === 'admin' ? (
             <DropdownMenuItem>
               <ShieldCheckIcon className="mr-2 h-4 w-4" />
               <span>Admin</span>
