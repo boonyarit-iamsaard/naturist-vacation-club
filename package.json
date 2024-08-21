@@ -24,9 +24,6 @@
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "tsc --noEmit --watch"
   },
-  "prisma": {
-    "seed": "dotenvx run -- tsx prisma/seed.ts"
-  },
   "dependencies": {
     "@clerk/nextjs": "^5.3.1",
     "@dotenvx/dotenvx": "^1.7.0",
