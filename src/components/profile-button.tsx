@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import { useClerk, useUser } from '@clerk/nextjs';
 import { Calendar, LogOut, ShieldCheckIcon, User } from 'lucide-react';
 
@@ -60,9 +62,11 @@ export function ProfileButton({ role }: Readonly<ProfileButtonProps>) {
             <span>Bookings</span>
           </DropdownMenuItem>
           {role === 'admin' ? (
-            <DropdownMenuItem>
-              <ShieldCheckIcon className="mr-2 h-4 w-4" />
-              <span>Admin</span>
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard">
+                <ShieldCheckIcon className="mr-2 h-4 w-4" />
+                <span>Admin</span>
+              </Link>
             </DropdownMenuItem>
           ) : null}
         </DropdownMenuGroup>
