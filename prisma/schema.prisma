@@ -9,23 +9,3 @@ datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
 }
-
-model User {
-    id             String    @id @default(uuid())
-    email          String    @unique
-    hashedPassword String    @map("hashed_password")
-    name           String?
-    image          String?
-    role           Role      @default(USER)
-    createdAt      DateTime  @default(now()) @map("created_at")
-    updatedAt      DateTime  @updatedAt @map("updated_at")
-    deletedAt      DateTime? @map("deleted_at")
-
-    @@index([email])
-    @@map("users")
-}
-
-enum Role {
-    USER  @map("user")
-    ADMIN @map("admin")
-}
