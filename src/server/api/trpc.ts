@@ -131,3 +131,30 @@ export const protectedProcedure = t.procedure
       },
     });
   });
+
+/**
+ * Admin (authenticated with admin role) procedure
+ *
+ * If you want a query or mutation to ONLY be accessible to logged in users with an admin role, use this.
+ * It verifies that the session is valid and the user has an admin role.
+ * If the user is not authorized, it throws a TRPCError with the code 'FORBIDDEN'.
+ *
+ * @see https://trpc.io/docs/procedures
+ */
+export const adminProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(({ ctx, next }) => {
+    if (
+      !ctx.auth?.sessionClaims?.metadata?.role ||
+      ctx.auth?.sessionClaims?.metadata?.role !== 'admin'
+    ) {
+      throw new TRPCError({ code: 'FORBIDDEN' });
+    }
+
+    return next({
+      ctx: {
+        // infers the `auth` as non-nullable
+        auth: ctx.auth,
+      },
+    });
+  });
