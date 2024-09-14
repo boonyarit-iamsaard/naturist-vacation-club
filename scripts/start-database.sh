@@ -69,4 +69,4 @@ docker run -d \
   -e POSTGRES_DB=naturist-vacation-club \
   -v "$DB_VOLUME_NAME":/var/lib/postgresql/data \
   -p "$DB_PORT":5432 \
-  docker.io/postgres && echo "Database container '$DB_CONTAINER_NAME' was successfully created"
+  docker.io/postgres:14-alpine && echo "Database container '$DB_CONTAINER_NAME' was successfully created"
