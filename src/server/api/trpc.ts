@@ -149,3 +149,17 @@ export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
 
   return next();
 });
+
+export type PublicContext = Awaited<ReturnType<typeof createTRPCContext>>;
+export type ProtectedContext = PublicContext & {
+  ctx: {
+    session: NonNullable<PublicContext['session']>;
+  };
+};
+export type AdminContext = ProtectedContext & {
+  session: ProtectedContext['session'] & {
+    user: {
+      role: 'ADMINISTRATOR' | 'OWNER';
+    };
+  };
+};

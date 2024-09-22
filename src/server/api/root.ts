@@ -1,3 +1,4 @@
+import { authRouter } from '~/server/api/routers/auth/auth.router';
 import {
   createCallerFactory,
   createTRPCRouter,
@@ -15,6 +16,7 @@ export const appRouter = createTRPCRouter({
       message: 'ok',
     };
   }),
+  auth: authRouter,
 });
 
 // export type definition of API
