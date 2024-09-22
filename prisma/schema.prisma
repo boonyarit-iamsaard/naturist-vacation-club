@@ -2,33 +2,32 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-model UserInfo {
-    id             String        @id @default(uuid())
-    userId         String        @unique @map("user_id")
-    createdAt      DateTime      @default(now()) @map("created_at")
-    updatedAt      DateTime      @updatedAt @map("updated_at")
-    deletedAt      DateTime?     @map("deleted_at")
-    organization   Organization? @relation(fields: [organizationId], references: [id])
-    organizationId String?       @map("organization_id")
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  hashedPassword String    @map("hashed_password")
+  name           String?
+  image          String?
+  role           Role      @default(GUEST)
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
 
-    @@map("users_info")
+  @@index([email])
+  @@map("users")
 }
 
-model Organization {
-    id        String     @id @default(uuid())
-    name      String
-    users     UserInfo[]
-    createdAt DateTime   @default(now()) @map("created_at")
-    updatedAt DateTime   @updatedAt @map("updated_at")
-    deletedAt DateTime?  @map("deleted_at")
-
-    @@map("organizations")
+enum Role {
+  GUEST         @map("guest")
+  MEMBER        @map("member")
+  ADMINISTRATOR @map("administrator")
+  OWNER         @map("owner")
 }

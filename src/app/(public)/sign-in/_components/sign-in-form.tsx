@@ -4,8 +4,8 @@ import { useState, type ChangeEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { useSignIn } from '@clerk/nextjs';
 import { Loader2 } from 'lucide-react';
+import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 
 import { Button } from '~/components/ui/button';
@@ -29,7 +29,6 @@ import { Input } from '~/components/ui/input';
 import { type SignInParams } from '~/libs/auth/validators';
 
 export function SignInForm() {
-  const { isLoaded, signIn, setActive } = useSignIn();
   const [loading, setLoading] = useState<boolean>(false);
   const [signInErrorMessage, setSignInErrorMessage] = useState<string | null>(
     null,
@@ -37,14 +36,14 @@ export function SignInForm() {
   const router = useRouter();
   const form = useForm<SignInParams>({
     defaultValues: {
-      identifier: '',
+      email: '',
       password: '',
     },
   });
 
   function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
-    form.setValue('identifier', event.target.value);
-    form.clearErrors('identifier');
+    form.setValue('email', event.target.value);
+    form.clearErrors('email');
     setSignInErrorMessage(null);
   }
 
@@ -55,38 +54,30 @@ export function SignInForm() {
   }
 
   async function onSubmit(values: SignInParams) {
-    if (!isLoaded) {
-      return;
-    }
-
     setLoading(true);
     setSignInErrorMessage(null);
 
-    try {
-      const { identifier, password } = values;
-      const signInAttempt = await signIn.create({
-        identifier,
-        password,
-      });
+    const { email, password } = values;
+    const response = await signIn('credentials', {
+      redirect: false,
+      email,
+      password,
+    });
 
-      if (signInAttempt.status === 'complete') {
-        await setActive({ session: signInAttempt.createdSessionId });
-        router.replace('/');
-      } else {
-        setLoading(false);
-        // TODO: handle error messages
-        console.error(JSON.stringify(signInAttempt, null, 2));
-      }
-    } catch (err: unknown) {
+    if (!response?.ok) {
+      // TODO: improve error message handling
+      console.error(response?.error);
+      setSignInErrorMessage(
+        response?.error ?? 'Unable to login, please try again later',
+      );
       setLoading(false);
-      // TODO: handle error messages
-      // See https://clerk.com/docs/custom-flows/error-handling
-      // for more info on error handling
-      console.error(JSON.stringify(err, null, 2));
+      return;
     }
+
+    setLoading(false);
+    router.replace('/');
   }
 
-  // TODO: improve form title and description
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto max-w-md">
@@ -103,7 +94,7 @@ export function SignInForm() {
             <div className="grid gap-4">
               <FormField
                 control={form.control}
-                name="identifier"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>

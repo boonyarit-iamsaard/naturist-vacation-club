@@ -1,14 +1,19 @@
-import Link from 'next/link';
+'use client';
 
-import { SignedIn, SignedOut } from '@clerk/nextjs';
-import { auth } from '@clerk/nextjs/server';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+import { useSession } from 'next-auth/react';
 
 import { ProfileButton } from '~/components/profile-button';
 import { Button } from '~/components/ui/button';
 
 export function SiteHeader() {
-  const { sessionClaims } = auth();
-  const role = sessionClaims?.metadata?.role;
+  const pathname = usePathname();
+  const { status } = useSession();
+
+  const authenticated = status === 'authenticated';
+  const isSignInPage = pathname.includes('/sign-in');
 
   return (
     <header className="sticky top-0 z-50 w-full border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -22,7 +27,7 @@ export function SiteHeader() {
           </Link>
         </div>
         <nav className="flex items-center gap-4 text-sm font-medium">
-          <SignedOut>
+          {isSignInPage || authenticated ? null : (
             <Button asChild variant="ghost" className="h-8 px-2 py-1.5">
               <Link
                 href="/sign-in"
@@ -32,10 +37,8 @@ export function SiteHeader() {
                 Sign in
               </Link>
             </Button>
-          </SignedOut>
-          <SignedIn>
-            <ProfileButton role={role} />
-          </SignedIn>
+          )}
+          {authenticated ? <ProfileButton /> : null}
         </nav>
       </div>
     </header>

@@ -6,11 +6,12 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
-import { auth } from '@clerk/nextjs/server';
 import { initTRPC, TRPCError } from '@trpc/server';
 import superjson from 'superjson';
 import { ZodError } from 'zod';
 
+import { hasAdministrativeRole } from '~/libs/auth/validators/has-administrative-role';
+import { getServerAuthSession } from '~/server/auth';
 import { db } from '~/server/db';
 
 /**
@@ -26,11 +27,11 @@ import { db } from '~/server/db';
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
-  const authContext = auth();
+  const session = await getServerAuthSession();
 
   return {
-    auth: authContext,
     db,
+    session,
     ...opts,
   };
 };
@@ -120,41 +121,31 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
-    if (!ctx.auth?.userId) {
+    if (!ctx.session?.user) {
       throw new TRPCError({ code: 'UNAUTHORIZED' });
     }
 
     return next({
       ctx: {
-        // infers the `auth` as non-nullable
-        auth: ctx.auth,
+        // infers the `session` as non-nullable
+        session: { ...ctx.session, user: ctx.session.user },
       },
     });
   });
 
 /**
- * Admin (authenticated with admin role) procedure
+ * Admin (authenticated with administrative role) procedure
  *
- * If you want a query or mutation to ONLY be accessible to logged in users with an admin role, use this.
+ * If you want a query or mutation to ONLY be accessible to logged in users with an administrative role,
  * It verifies that the session is valid and the user has an admin role.
  * If the user is not authorized, it throws a TRPCError with the code 'FORBIDDEN'.
  *
  * @see https://trpc.io/docs/procedures
  */
-export const adminProcedure = t.procedure
-  .use(timingMiddleware)
-  .use(({ ctx, next }) => {
-    if (
-      !ctx.auth?.sessionClaims?.metadata?.role ||
-      ctx.auth?.sessionClaims?.metadata?.role !== 'admin'
-    ) {
-      throw new TRPCError({ code: 'FORBIDDEN' });
-    }
+export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (!hasAdministrativeRole(ctx.session.user.role)) {
+    throw new TRPCError({ code: 'FORBIDDEN' });
+  }
 
-    return next({
-      ctx: {
-        // infers the `auth` as non-nullable
-        auth: ctx.auth,
-      },
-    });
-  });
+  return next();
+});

@@ -1,4 +1,3 @@
-import { userInfoRouter } from '~/server/api/routers/user-info';
 import {
   createCallerFactory,
   createTRPCRouter,
@@ -16,7 +15,6 @@ export const appRouter = createTRPCRouter({
       message: 'ok',
     };
   }),
-  userInfo: userInfoRouter,
 });
 
 // export type definition of API

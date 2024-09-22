@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-import { useClerk, useUser } from '@clerk/nextjs';
 import { Calendar, LogOut, ShieldCheckIcon, User } from 'lucide-react';
+import { signOut, useSession } from 'next-auth/react';
 
 import { Button } from '~/components/ui/button';
 import {
@@ -16,17 +17,18 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
 import { Skeleton } from '~/components/ui/skeleton';
+import { hasAdministrativeRole } from '~/libs/auth/validators/has-administrative-role';
 
-type ProfileButtonProps = {
-  role?: CustomJwtSessionClaims['metadata']['role'];
-};
-
-export function ProfileButton({ role }: Readonly<ProfileButtonProps>) {
-  const { signOut } = useClerk();
-  const { isSignedIn, user, isLoaded } = useUser();
+export function ProfileButton() {
+  const router = useRouter();
+  const { data, status } = useSession();
 
   async function handleSignOut() {
-    await signOut({ redirectUrl: '/' });
+    const response = await signOut({
+      redirect: false,
+      callbackUrl: '/sign-in',
+    });
+    router.push(response.url);
   }
 
   return (
@@ -41,12 +43,12 @@ export function ProfileButton({ role }: Readonly<ProfileButtonProps>) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuLabel className="flex flex-col">
-          {!isLoaded ? <Skeleton className="h-9" /> : null}
-          {isSignedIn ? (
+          {status === 'loading' ? <Skeleton className="h-9" /> : null}
+          {status === 'authenticated' ? (
             <>
-              <span>{user?.fullName}</span>
+              <span>{data?.user?.name}</span>
               <span className="text-xs font-normal text-muted-foreground">
-                {user?.primaryEmailAddress?.emailAddress}
+                {data?.user?.email}
               </span>
             </>
           ) : null}
@@ -63,7 +65,7 @@ export function ProfileButton({ role }: Readonly<ProfileButtonProps>) {
             <Calendar className="mr-2 h-4 w-4" />
             <span>Bookings</span>
           </DropdownMenuItem>
-          {role === 'admin' ? (
+          {hasAdministrativeRole(data?.user?.role) ? (
             <DropdownMenuItem asChild>
               <Link href="/dashboard">
                 <ShieldCheckIcon className="mr-2 h-4 w-4" />
