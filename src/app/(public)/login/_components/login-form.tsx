@@ -4,6 +4,7 @@ import { useState, type ChangeEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
@@ -26,36 +27,40 @@ import {
   FormMessage,
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
-import { type SignInParams } from '~/libs/auth/validators';
+import {
+  loginRequestSchema,
+  type LoginRequest,
+} from '~/server/api/routers/auth/auth.schema';
 
-export function SignInForm() {
+export function LoginForm() {
   const [loading, setLoading] = useState<boolean>(false);
-  const [signInErrorMessage, setSignInErrorMessage] = useState<string | null>(
+  const [loginErrorMessage, setLoginErrorMessage] = useState<string | null>(
     null,
   );
   const router = useRouter();
-  const form = useForm<SignInParams>({
+  const form = useForm<LoginRequest>({
     defaultValues: {
       email: '',
       password: '',
     },
+    resolver: zodResolver(loginRequestSchema),
   });
 
   function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
     form.setValue('email', event.target.value);
     form.clearErrors('email');
-    setSignInErrorMessage(null);
+    setLoginErrorMessage(null);
   }
 
   function handlePasswordChange(event: ChangeEvent<HTMLInputElement>) {
     form.setValue('password', event.target.value);
     form.clearErrors('password');
-    setSignInErrorMessage(null);
+    setLoginErrorMessage(null);
   }
 
-  async function onSubmit(values: SignInParams) {
+  async function onSubmit(values: LoginRequest) {
     setLoading(true);
-    setSignInErrorMessage(null);
+    setLoginErrorMessage(null);
 
     const { email, password } = values;
     const response = await signIn('credentials', {
@@ -67,7 +72,7 @@ export function SignInForm() {
     if (!response?.ok) {
       // TODO: improve error message handling
       console.error(response?.error);
-      setSignInErrorMessage(
+      setLoginErrorMessage(
         response?.error ?? 'Unable to login, please try again later',
       );
       setLoading(false);
@@ -84,10 +89,10 @@ export function SignInForm() {
         <Card>
           <CardHeader className="md:p-8">
             <CardTitle className="text-lg md:text-2xl">
-              Sign in to Naturist Vacation Club
+              Login to Naturist Vacation Club
             </CardTitle>
             <CardDescription>
-              Welcome back, Please sign in to continue.
+              Welcome back, Please login to continue.
             </CardDescription>
           </CardHeader>
           <CardContent className="md:p-8 md:pt-0">
@@ -122,7 +127,7 @@ export function SignInForm() {
                     <div className="flex items-center">
                       <FormLabel>Password</FormLabel>
                       <Link
-                        href="/forgot-password"
+                        href="/reset-password"
                         className="ml-auto inline-block text-sm underline"
                       >
                         Forgot your password?
@@ -144,9 +149,9 @@ export function SignInForm() {
               />
             </div>
 
-            {signInErrorMessage ? (
+            {loginErrorMessage ? (
               <div className="mt-4 rounded-md border border-destructive/50 bg-destructive/10 px-4 py-2 text-center text-sm text-destructive">
-                {signInErrorMessage}
+                {loginErrorMessage}
               </div>
             ) : null}
           </CardContent>
@@ -155,7 +160,7 @@ export function SignInForm() {
               {loading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              Sign in
+              Login
             </Button>
           </CardFooter>
         </Card>

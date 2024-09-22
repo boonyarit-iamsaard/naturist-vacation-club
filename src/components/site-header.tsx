@@ -13,7 +13,7 @@ export function SiteHeader() {
   const { status } = useSession();
 
   const authenticated = status === 'authenticated';
-  const isSignInPage = pathname.includes('/sign-in');
+  const isLoginPage = pathname.includes('/login');
 
   return (
     <header className="sticky top-0 z-50 w-full border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -27,14 +27,14 @@ export function SiteHeader() {
           </Link>
         </div>
         <nav className="flex items-center gap-4 text-sm font-medium">
-          {isSignInPage || authenticated ? null : (
+          {isLoginPage || authenticated ? null : (
             <Button asChild variant="ghost" className="h-8 px-2 py-1.5">
               <Link
-                href="/sign-in"
+                href="/login"
                 className="transition-colors hover:text-foreground/80"
                 prefetch
               >
-                Sign in
+                Login
               </Link>
             </Button>
           )}

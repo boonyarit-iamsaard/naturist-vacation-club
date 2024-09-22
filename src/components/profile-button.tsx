@@ -26,7 +26,7 @@ export function ProfileButton() {
   async function handleSignOut() {
     const response = await signOut({
       redirect: false,
-      callbackUrl: '/sign-in',
+      callbackUrl: '/login',
     });
     router.push(response.url);
   }

@@ -8,7 +8,7 @@ import {
 } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
-import { signInParams } from '~/libs/auth/validators';
+import { loginRequestSchema } from '~/server/api/routers/auth/auth.schema';
 import { db } from '~/server/db';
 
 /**
@@ -82,7 +82,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: '/sign-in',
+    signIn: '/login',
   },
   providers: [
     CredentialsProvider({
@@ -100,7 +100,7 @@ export const authOptions: NextAuthOptions = {
         },
       },
       async authorize(credentials) {
-        const result = signInParams.safeParse(credentials);
+        const result = loginRequestSchema.safeParse(credentials);
         if (!result.success) {
           throw new Error('invalid credentials');
         }
