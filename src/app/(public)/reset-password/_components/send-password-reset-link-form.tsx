@@ -30,7 +30,7 @@ import {
 } from '~/server/api/routers/auth/auth.schema';
 import { api } from '~/trpc/react';
 
-export function ForgotPasswordForm() {
+export function SendPasswordResetLinkForm() {
   const form = useForm<SendPasswordResetLinkRequest>({
     defaultValues: {
       email: '',
@@ -103,7 +103,7 @@ export function ForgotPasswordForm() {
               {sendPasswordResetLink.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              Sign in
+              Send Password Reset Link
             </Button>
           </CardFooter>
         </Card>
