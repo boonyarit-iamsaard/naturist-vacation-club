@@ -10,8 +10,6 @@
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
-    "db:start": "./scripts/start-database.sh",
-    "db:stop": "./scripts/stop-database.sh",
     "db:studio": "prisma studio",
     "dev": "next dev",
     "format": "prettier --write .",
