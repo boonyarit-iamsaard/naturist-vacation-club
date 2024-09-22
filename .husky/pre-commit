@@ -1,24 +1,8 @@
-# Check for formatting
-echo "🔎 Checking formatting...";
-pnpm format:check ||
+# Run lint-staged
+echo "🔎 Running lint-staged...";
+pnpm lint-staged ||
 (
-  echo "❌ Formatting errors detected. Please run 'pnpm format' and commit again.";
-  false;
-)
-
-# Check for linting
-echo "🔎 Checking linting...";
-pnpm lint:check ||
-(
-  echo "❌ Linting errors detected. Please run 'pnpm lint' and commit again.";
-  false;
-)
-
-# Check for type errors
-echo "🔎 Checking type errors...";
-pnpm typecheck ||
-(
-  echo "❌ Type errors detected. Please fix and commit again.";
+  echo "❌ Lint-staged errors detected. Please fix and commit again.";
   false;
 )
 

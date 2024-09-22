@@ -1,8 +1,8 @@
-# Check for build errors
-echo "🔎 Checking build...";
-pnpm build ||
+# Check for type errors
+echo "🔎 Checking types...";
+pnpm typecheck ||
 (
-  echo "❌ Build errors detected. Please fix and commit again.";
+  echo "❌ Type errors detected. Please fix and commit again.";
   false;
 )
 
