@@ -21,7 +21,7 @@
             }
         },
         {
-            "files": ["*.md"],
+            "files": ["*.{md,yml,yaml}"],
             "options": {
                 "tabWidth": 2
             }
