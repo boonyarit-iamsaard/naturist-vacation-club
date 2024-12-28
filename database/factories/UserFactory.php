@@ -17,15 +17,31 @@ class UserFactory extends Factory
     protected static ?string $password;
 
     /**
+     * Counter for generating sequential user numbers
+     */
+    protected static int $totalCount = 0;
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
+        self::$totalCount++;
+
+        $paddingLength = strlen((string) $this->count);
+        $paddedSequence = str_pad(self::$totalCount, $paddingLength, '0', STR_PAD_LEFT);
+
+        $name = "User-{$paddedSequence}";
+        $email = "user-{$paddedSequence}@example.com";
+
+        $gender = $this->faker->randomElement(['male', 'female']);
+
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name' => $name,
+            'email' => $email,
+            'gender' => $gender,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
