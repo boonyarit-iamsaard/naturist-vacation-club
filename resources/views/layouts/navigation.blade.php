@@ -21,6 +21,36 @@
                     >
                         Our Rooms
                     </x-nav-link>
+                    <x-nav-link
+                        :href="route('onsen')"
+                        :active="request()->routeIs('onsen')"
+                    >
+                        Riva Waree Onsen
+                    </x-nav-link>
+                    <x-nav-link
+                        :href="route('facilities')"
+                        :active="request()->routeIs('facilities')"
+                    >
+                        Facilities
+                    </x-nav-link>
+                    <x-nav-link
+                        :href="route('memberships')"
+                        :active="request()->routeIs('memberships')"
+                    >
+                        Memberships
+                    </x-nav-link>
+                    <x-nav-link
+                        :href="route('faq')"
+                        :active="request()->routeIs('faq')"
+                    >
+                        FAQ
+                    </x-nav-link>
+                    <x-nav-link
+                        :href="route('about')"
+                        :active="request()->routeIs('about')"
+                    >
+                        About
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -129,6 +159,36 @@
                 :active="request()->routeIs('rooms')"
             >
                 Our Rooms
+            </x-responsive-nav-link>
+            <x-responsive-nav-link
+                :href="route('onsen')"
+                :active="request()->routeIs('onsen')"
+            >
+                Riva Waree Onsen
+            </x-responsive-nav-link>
+            <x-responsive-nav-link
+                :href="route('facilities')"
+                :active="request()->routeIs('facilities')"
+            >
+                Facilities
+            </x-responsive-nav-link>
+            <x-responsive-nav-link
+                :href="route('memberships')"
+                :active="request()->routeIs('memberships')"
+            >
+                Memberships
+            </x-responsive-nav-link>
+            <x-responsive-nav-link
+                :href="route('faq')"
+                :active="request()->routeIs('faq')"
+            >
+                FAQ
+            </x-responsive-nav-link>
+            <x-responsive-nav-link
+                :href="route('about')"
+                :active="request()->routeIs('about')"
+            >
+                About
             </x-responsive-nav-link>
         </div>
 
