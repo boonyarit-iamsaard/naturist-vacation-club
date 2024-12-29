@@ -11,17 +11,22 @@
             content="{{ csrf_token() }}"
         >
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name') }}</title>
 
         <!-- Fonts -->
         <link
             rel="preconnect"
-            href="https://fonts.bunny.net"
+            href="https://fonts.googleapis.com"
         >
         <link
-            href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap"
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossorigin
+        >
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
             rel="stylesheet"
-        />
+        >
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -33,7 +38,7 @@
             <!-- Page Heading -->
             @isset($header)
                 <header class="bg-white shadow dark:bg-gray-800">
-                    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                    <div class="mx-auto max-w-7xl px-4 py-6 font-serif sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
                 </header>
