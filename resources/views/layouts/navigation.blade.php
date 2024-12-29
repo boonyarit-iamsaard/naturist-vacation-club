@@ -1,15 +1,14 @@
-<nav
-    x-data="{ open: false }"
-    class="border-b border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800"
+<header
+    class="fixed top-0 z-50 w-full bg-foreground backdrop-blur supports-[backdrop-filter]:bg-foreground/85 dark:bg-background supports-[backdrop-filter]:dark:bg-background/85"
 >
-    <!-- Primary Navigation Menu -->
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="flex h-16 justify-between">
+    <nav x-data="{ open: false }">
+        <!-- Primary Navigation Menu -->
+        <div class="container flex h-16 justify-between">
             <div class="flex">
                 <!-- Logo -->
                 <div class="flex shrink-0 items-center">
                     <a href="{{ route('home') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current" />
+                        <x-application-logo class="block h-9 w-auto fill-background dark:fill-foreground" />
                     </a>
                 </div>
 
@@ -115,9 +114,11 @@
             @endauth
 
             <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
+            <div class="flex items-center sm:hidden">
                 <button
                     @click="open = ! open"
+                    aria-label="Toggle navigation"
+                    type="button"
                     class="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none dark:text-gray-500 dark:hover:bg-gray-900 dark:hover:text-gray-400 dark:focus:bg-gray-900 dark:focus:text-gray-400"
                 >
                     <svg
@@ -146,88 +147,88 @@
                 </button>
             </div>
         </div>
-    </div>
 
-    <!-- Responsive Navigation Menu -->
-    <div
-        :class="{ 'block': open, 'hidden': !open }"
-        class="hidden sm:hidden"
-    >
-        <div class="space-y-1 pb-3 pt-2">
-            <x-responsive-nav-link
-                :href="route('rooms')"
-                :active="request()->routeIs('rooms')"
-            >
-                Our Rooms
-            </x-responsive-nav-link>
-            <x-responsive-nav-link
-                :href="route('onsen')"
-                :active="request()->routeIs('onsen')"
-            >
-                Riva Waree Onsen
-            </x-responsive-nav-link>
-            <x-responsive-nav-link
-                :href="route('facilities')"
-                :active="request()->routeIs('facilities')"
-            >
-                Facilities
-            </x-responsive-nav-link>
-            <x-responsive-nav-link
-                :href="route('memberships')"
-                :active="request()->routeIs('memberships')"
-            >
-                Memberships
-            </x-responsive-nav-link>
-            <x-responsive-nav-link
-                :href="route('faq')"
-                :active="request()->routeIs('faq')"
-            >
-                FAQ
-            </x-responsive-nav-link>
-            <x-responsive-nav-link
-                :href="route('about')"
-                :active="request()->routeIs('about')"
-            >
-                About
-            </x-responsive-nav-link>
-        </div>
-
-        <!-- Responsive Settings Options -->
-        @auth
-            <div class="border-t border-gray-200 pb-1 pt-4 dark:border-gray-600">
-                <div class="px-4">
-                    <div class="text-base font-medium text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
-                    <div class="text-sm font-medium text-gray-500">{{ Auth::user()->email }}</div>
-                </div>
-
-                <div class="mt-3 space-y-1">
-                    <x-responsive-nav-link :href="route('profile.edit')">
-                        Profile
-                    </x-responsive-nav-link>
-
-                    <!-- Authentication -->
-                    <form
-                        method="POST"
-                        action="{{ route('logout') }}"
-                    >
-                        @csrf
-
-                        <x-responsive-nav-link
-                            :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();"
-                        >
-                            Log Out
-                        </x-responsive-nav-link>
-                    </form>
-                </div>
-            </div>
-        @else
-            <div class="border-t border-gray-200 pb-1 pt-4 dark:border-gray-600">
-                <x-responsive-nav-link :href="route('login')">
-                    Log In
+        <!-- Responsive Navigation Menu -->
+        <div
+            :class="{ 'block': open, 'hidden': !open }"
+            class="hidden sm:hidden"
+        >
+            <div class="space-y-1 pb-3 pt-2">
+                <x-responsive-nav-link
+                    :href="route('rooms')"
+                    :active="request()->routeIs('rooms')"
+                >
+                    Our Rooms
+                </x-responsive-nav-link>
+                <x-responsive-nav-link
+                    :href="route('onsen')"
+                    :active="request()->routeIs('onsen')"
+                >
+                    Riva Waree Onsen
+                </x-responsive-nav-link>
+                <x-responsive-nav-link
+                    :href="route('facilities')"
+                    :active="request()->routeIs('facilities')"
+                >
+                    Facilities
+                </x-responsive-nav-link>
+                <x-responsive-nav-link
+                    :href="route('memberships')"
+                    :active="request()->routeIs('memberships')"
+                >
+                    Memberships
+                </x-responsive-nav-link>
+                <x-responsive-nav-link
+                    :href="route('faq')"
+                    :active="request()->routeIs('faq')"
+                >
+                    FAQ
+                </x-responsive-nav-link>
+                <x-responsive-nav-link
+                    :href="route('about')"
+                    :active="request()->routeIs('about')"
+                >
+                    About
                 </x-responsive-nav-link>
             </div>
-        @endauth
-    </div>
-</nav>
+
+            <!-- Responsive Settings Options -->
+            @auth
+                <div class="border-t border-gray-200 pb-1 pt-4 dark:border-gray-600">
+                    <div class="px-4">
+                        <div class="text-base font-medium text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
+                        <div class="text-sm font-medium text-gray-500">{{ Auth::user()->email }}</div>
+                    </div>
+
+                    <div class="mt-3 space-y-1">
+                        <x-responsive-nav-link :href="route('profile.edit')">
+                            Profile
+                        </x-responsive-nav-link>
+
+                        <!-- Authentication -->
+                        <form
+                            method="POST"
+                            action="{{ route('logout') }}"
+                        >
+                            @csrf
+
+                            <x-responsive-nav-link
+                                :href="route('logout')"
+                                onclick="event.preventDefault();
+                                        this.closest('form').submit();"
+                            >
+                                Log Out
+                            </x-responsive-nav-link>
+                        </form>
+                    </div>
+                </div>
+            @else
+                <div class="border-t border-gray-200 pb-1 pt-4 dark:border-gray-600">
+                    <x-responsive-nav-link :href="route('login')">
+                        Log In
+                    </x-responsive-nav-link>
+                </div>
+            @endauth
+        </div>
+    </nav>
+</header>

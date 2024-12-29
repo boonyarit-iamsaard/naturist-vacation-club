@@ -31,23 +31,27 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-            @include('layouts.navigation')
+    <body class="relative flex min-h-screen flex-col bg-background font-sans text-foreground antialiased">
+        @include('layouts.navigation')
 
-            <!-- Page Heading -->
+        <main class="flex-1">
+            <!-- Page Header -->
             @isset($header)
-                <header class="bg-white shadow dark:bg-gray-800">
-                    <div class="mx-auto max-w-7xl px-4 py-6 font-serif sm:px-6 lg:px-8">
+                <section class="bg-gradient-to-b from-black/60 via-black/40 to-black/20">
+                    <div class="h-16"></div>
+                    <div
+                        class="container grid h-[35vh] place-items-center text-center font-serif text-background dark:text-foreground">
                         {{ $header }}
                     </div>
-                </header>
+                </section>
+            @else
+                <div class="h-16"></div>
             @endisset
 
             <!-- Page Content -->
-            <main>
+            <div class="container py-12">
                 {{ $slot }}
-            </main>
-        </div>
+            </div>
+        </main>
     </body>
 </html>
