@@ -13,6 +13,11 @@
 
         <title>{{ config('app.name') }}</title>
 
+        <link
+            rel="icon"
+            href="{{ asset('favicon.ico') }}"
+        >
+
         <!-- Fonts -->
         <link
             rel="preconnect"
