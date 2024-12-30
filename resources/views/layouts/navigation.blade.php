@@ -87,9 +87,12 @@
                             <x-dropdown-link :href="route('profile.edit')">
                                 Profile
                             </x-dropdown-link>
-                            <x-dropdown-link href="/admin">
-                                Admin
-                            </x-dropdown-link>
+
+                            @if (auth()->user()->isAdministrator())
+                                <x-dropdown-link href="/admin">
+                                    Admin
+                                </x-dropdown-link>
+                            @endif
 
                             <!-- Authentication -->
                             <form
@@ -211,6 +214,12 @@
                         <x-responsive-nav-link :href="route('profile.edit')">
                             Profile
                         </x-responsive-nav-link>
+
+                        @if (auth()->user()->isAdministrator())
+                            <x-responsive-nav-link href="/admin">
+                                Admin
+                            </x-responsive-nav-link>
+                        @endif
 
                         <!-- Authentication -->
                         <form
