@@ -9,6 +9,8 @@ use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
@@ -96,6 +98,24 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public function isAdministrator(): bool
     {
         return $this->role === 'administrator' || $this->role === 'owner';
+    }
+
+    /**
+     * @return HasOne<UserMembership, covariant User>
+     */
+    public function activeUserMembership(): HasOne
+    {
+        return $this->hasOne(UserMembership::class)
+            ->where('start_date', '<=', now())
+            ->where('end_date', '>=', now());
+    }
+
+    /**
+     * @return HasMany<UserMembership, covariant User>
+     */
+    public function userMemberships(): HasMany
+    {
+        return $this->hasMany(UserMembership::class);
     }
 
     /**

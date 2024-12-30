@@ -36,7 +36,7 @@ class UserFactory extends Factory
         $name = "User-{$paddedSequence}";
         $email = "user-{$paddedSequence}@example.com";
 
-        $gender = $this->faker->randomElement(['male', 'female']);
+        $gender = fake()->boolean() ? 'male' : 'female';
 
         return [
             'name' => $name,
