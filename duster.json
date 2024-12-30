@@ -1,5 +1,5 @@
 {
-    "exclude": ["_ide_helper.php"],
+    "exclude": [".phpstorm.meta.php", "_ide_helper.php"],
     "scripts": {
         "lint": {
             "PHPstan": ["./vendor/bin/phpstan", "analyse", "--memory-limit=2G"]

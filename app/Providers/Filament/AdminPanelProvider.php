@@ -26,6 +26,7 @@ class AdminPanelProvider extends PanelProvider
     private static function brandLogo()
     {
         return view('components.application-logo', [
+            // FIXME: method signature uses 0 parameters
             'attributes' => new ComponentAttributeBag(['class' => 'h-9 w-auto']),
         ]);
     }

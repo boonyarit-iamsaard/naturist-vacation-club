@@ -1,6 +1,6 @@
 {
     "preset": "laravel",
-    "notPath": ["_ide_helper.php"],
+    "notPath": [".phpstorm.meta.php", "_ide_helper.php"],
     "rules": {
         "blank_line_between_import_groups": true,
         "concat_space": {
