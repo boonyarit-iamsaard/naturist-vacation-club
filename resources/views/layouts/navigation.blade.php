@@ -62,28 +62,19 @@
                     >
                         <x-slot name="trigger">
                             <button
-                                class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none dark:bg-gray-800 dark:text-gray-400 dark:hover:text-gray-300"
+                                type="button"
+                                class="inline-flex size-10 items-center justify-center rounded-full border border-background/60 bg-transparent text-background/60 transition duration-150 ease-in-out hover:border-background/80 hover:text-background/80 focus:border-background/80 focus:outline-none dark:border-foreground/60 dark:text-foreground/60 dark:hover:border-foreground/80 dark:hover:text-foreground/80 dark:focus:border-foreground/80"
                             >
-                                <!-- TODO: replace with avatar -->
-                                <div>{{ auth()->user()->name }}</div>
-
-                                <div class="ms-1">
-                                    <svg
-                                        class="h-4 w-4 fill-current"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 20 20"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                            clip-rule="evenodd"
-                                        />
-                                    </svg>
-                                </div>
+                                <x-tabler-user class="h-4 w-4" />
+                                <span class="sr-only">{{ auth()->user()->name }}</span>
                             </button>
                         </x-slot>
 
                         <x-slot name="content">
+                            <div class="px-4 py-2 text-sm text-muted-foreground">
+                                {{ auth()->user()->name }}
+                            </div>
+
                             <x-dropdown-link :href="route('profile.edit')">
                                 Profile
                             </x-dropdown-link>
