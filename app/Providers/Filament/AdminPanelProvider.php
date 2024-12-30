@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use Exception;
+use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -17,10 +18,18 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+    private static function brandLogo()
+    {
+        return view('components.application-logo', [
+            'attributes' => new ComponentAttributeBag(['class' => 'h-9 w-auto']),
+        ]);
+    }
+
     /**
      * @throws Exception
      */
@@ -32,8 +41,11 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->homeUrl('/')
             ->login()
+            ->font('Montserrat', provider: GoogleFontProvider::class)
+            ->brandLogoHeight('36px')
+            ->brandLogo(fn () => self::brandLogo())
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Slate,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
