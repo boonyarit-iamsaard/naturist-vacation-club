@@ -55,7 +55,7 @@
 
             <!-- Settings Dropdown or Login Button -->
             @auth
-                <div class="hidden sm:ms-6 sm:flex sm:items-center">
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex sm:items-center">
                     <x-dropdown
                         align="right"
                         width="48"
@@ -64,6 +64,7 @@
                             <button
                                 class="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none dark:bg-gray-800 dark:text-gray-400 dark:hover:text-gray-300"
                             >
+                                <!-- TODO: replace with avatar -->
                                 <div>{{ auth()->user()->name }}</div>
 
                                 <div class="ms-1">
@@ -85,6 +86,9 @@
                         <x-slot name="content">
                             <x-dropdown-link :href="route('profile.edit')">
                                 Profile
+                            </x-dropdown-link>
+                            <x-dropdown-link href="/admin">
+                                Admin
                             </x-dropdown-link>
 
                             <!-- Authentication -->
