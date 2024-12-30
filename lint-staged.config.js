@@ -1,4 +1,4 @@
 export default {
-    '**/*.php*': ['vendor/bin/duster lint'],
+    '**/*.php*,!_ide_helper.php': ['vendor/bin/duster lint'],
     '**/*': 'prettier --check --ignore-unknown',
 };
