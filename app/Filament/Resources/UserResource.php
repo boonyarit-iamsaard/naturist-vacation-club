@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
+use App\Filament\Resources\UserResource\RelationManagers\UserMembershipsRelationManager;
 use App\Models\User;
 use Exception;
 use Filament\Forms\Components\FileUpload;
@@ -90,6 +91,25 @@ class UserResource extends Resource
                     ->defaultImageUrl(fn (?User $record): string => $record?->gender === 'male'
                         ? 'https://i.pravatar.cc/150?img=56'
                         : 'https://i.pravatar.cc/150?img=45'),
+                TextColumn::make('activeUserMembership.membership_number')
+                    ->label('Membership')
+                    ->badge()
+                    ->color(fn (?string $state, User $record): string => match ($record->activeUserMembership->membership->name ?? null) {
+                        'gold' => 'warning',
+                        'silver' => 'gray',
+                        default => 'info',
+                    })
+                    ->getStateUsing(function (User $record) {
+                        if ($record->isAdministrator()) {
+                            return null;
+                        }
+
+                        if ($record->activeUserMembership) {
+                            return Str::upper($record->activeUserMembership->membership_number);
+                        }
+
+                        return 'Guest';
+                    }),
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('email')
@@ -140,7 +160,7 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            UserMembershipsRelationManager::class,
         ];
     }
 

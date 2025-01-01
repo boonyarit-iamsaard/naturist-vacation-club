@@ -32,12 +32,8 @@ class UserMembership extends Model
 
     /**
      * Generate or retrieve a unique membership number.
-     *
-     * @param  int  $userId  The ID of the user.
-     * @param  int  $membershipId  The ID of the membership type.
-     * @return string The unique membership number.
      */
-    public static function findOrCreateMembershipNumber($userId, $membershipId)
+    public static function findOrCreateMembershipNumber(int $userId, int $membershipId): string
     {
         /**
          * Fetch the membership type code based on membership ID.
