@@ -31,7 +31,7 @@ class UserFactory extends Factory
         self::$totalCount++;
 
         $paddingLength = strlen((string) $this->count);
-        $paddedSequence = str_pad(self::$totalCount, $paddingLength, '0', STR_PAD_LEFT);
+        $paddedSequence = str_pad((string) self::$totalCount, $paddingLength, '0', STR_PAD_LEFT);
 
         $name = "User-{$paddedSequence}";
         $email = "user-{$paddedSequence}@example.com";

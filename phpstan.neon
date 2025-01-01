@@ -6,12 +6,19 @@ parameters:
 
     paths:
         - app/
+        - routes/
+        - bootstrap/
+        - config/
+        - database/
+        - resources/views/
+        - tests/
 
     # Level 10 is the highest level
     level: 5
 
-#    ignoreErrors:
-#        - '#PHPDoc tag @var#'
-#
+    ignoreErrors:
+        - '#Call to an undefined method .*TestCase::.*#'
+        - '#Undefined variable: \$this#'
+
 #    excludePaths:
 #        - ./*/*/FileToBeExcluded.php
