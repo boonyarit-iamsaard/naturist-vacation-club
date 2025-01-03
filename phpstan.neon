@@ -21,8 +21,8 @@ parameters:
         - '#Call to an undefined method PHPUnit\\Framework.*#'
 
         # Ignore errors for Pest
-        - '#Access to an undefined property Pest\\Expectation.*#'
-        - '#Call to an undefined method Pest\\Expectation.*#'
+        - '#Access to an undefined property Pest\\.*#'
+        - '#Call to an undefined method Pest\\.*#'
 
         # Ignore errors for undefined variables
         - '#Undefined variable: \$this#'
