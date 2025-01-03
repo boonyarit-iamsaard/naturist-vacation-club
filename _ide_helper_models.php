@@ -18,12 +18,13 @@ namespace App\Models{
  * @property int $id
  * @property string $name
  * @property string $code
- * @property int $membership_price_id
  * @property int $room_discount Discount percentage for room prices
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \App\Models\MembershipPrice $price
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MembershipPrice> $prices
+ * @property-read int|null $prices_count
+ * @property-read \App\Models\MembershipSequence|null $sequence
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserMembership> $userMemberships
  * @property-read int|null $user_memberships_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Membership newModelQuery()
@@ -34,7 +35,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Membership whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Membership whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Membership whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Membership whereMembershipPriceId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Membership whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Membership whereRoomDiscount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Membership whereUpdatedAt($value)
@@ -51,20 +51,33 @@ namespace App\Models{
  * @property int $id
  * @property int $female
  * @property int $male
+ * @property string $type
+ * @property string|null $promotion_name
+ * @property \Illuminate\Support\Carbon $effective_from
+ * @property \Illuminate\Support\Carbon|null $effective_to
+ * @property int $membership_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Membership> $memberships
- * @property-read int|null $memberships_count
+ * @property-read \App\Models\Membership $membership
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice active(?\Carbon\Carbon $date = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice future()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice promotional()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice standard()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice whereEffectiveFrom($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice whereEffectiveTo($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice whereFemale($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice whereMale($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice whereMembershipId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice wherePromotionName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipPrice withoutTrashed()
@@ -96,6 +109,94 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MembershipSequence withoutTrashed()
  */
 	class MembershipSequence extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property string $name
+ * @property int $room_type_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\RoomType $roomType
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Room newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Room newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Room onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Room query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Room whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Room whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Room whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Room whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Room whereRoomTypeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Room whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Room withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Room withoutTrashed()
+ */
+	class Room extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property int $weekday
+ * @property int $weekend
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\RoomType> $roomTypes
+ * @property-read int|null $room_types_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomPrice newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomPrice newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomPrice onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomPrice query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomPrice whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomPrice whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomPrice whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomPrice whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomPrice whereWeekday($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomPrice whereWeekend($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomPrice withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomPrice withoutTrashed()
+ */
+	class RoomPrice extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * 
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $code
+ * @property string|null $description
+ * @property int $room_price_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\RoomPrice $roomPrice
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Room> $rooms
+ * @property-read int|null $rooms_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType whereRoomPriceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|RoomType withoutTrashed()
+ */
+	class RoomType extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -164,6 +265,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property int|null $created_by
+ * @property int|null $updated_by
  * @property-read \App\Models\Membership|null $membership
  * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership newModelQuery()
@@ -171,6 +274,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership whereCreatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership whereEndDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership whereId($value)
@@ -180,6 +284,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership whereMembershipPriceAtJoining($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership whereStartDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership whereUpdatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership whereUserEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership whereUserGender($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserMembership whereUserId($value)
