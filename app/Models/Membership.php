@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Membership extends Model
@@ -14,7 +14,6 @@ class Membership extends Model
     protected $fillable = [
         'name',
         'code',
-        'membership_price_id',
         'room_discount',
     ];
 
@@ -43,11 +42,11 @@ class Membership extends Model
     }
 
     /**
-     * @return BelongsTo<MembershipPrice, covariant Membership>
+     * @return HasMany<MembershipPrice, covariant Membership>
      */
-    public function price(): BelongsTo
+    public function prices(): HasMany
     {
-        return $this->belongsTo(MembershipPrice::class, 'membership_price_id');
+        return $this->hasMany(MembershipPrice::class);
     }
 
     /**
@@ -56,5 +55,13 @@ class Membership extends Model
     public function userMemberships(): HasMany
     {
         return $this->hasMany(UserMembership::class);
+    }
+
+    /**
+     * @return HasOne<MembershipSequence, covariant Membership>
+     */
+    public function sequence(): HasOne
+    {
+        return $this->hasOne(MembershipSequence::class, 'membership_code', 'code');
     }
 }

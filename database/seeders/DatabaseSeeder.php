@@ -15,10 +15,10 @@ class DatabaseSeeder extends Seeder
         User::factory(10)->create();
 
         $this->call([
+            AdminSeeder::class,
             MembershipSeeder::class,
             UserMembershipSeeder::class,
             RoomTypeSeeder::class,
-            AdminSeeder::class,
         ]);
     }
 }

@@ -31,13 +31,8 @@ class UserMembershipsRelationManager extends RelationManager
 
     protected static string $displayDateFormat = 'F j, Y';
 
-    /** @var EloquentCollection<int, Membership> */
-    protected EloquentCollection $memberships;
-
-    public function __construct()
-    {
-        $this->memberships = Membership::with('price')->get();
-    }
+    /** @var EloquentCollection<int, Membership>|null */
+    protected ?EloquentCollection $memberships = null;
 
     public function form(Form $form): Form
     {
@@ -110,11 +105,25 @@ class UserMembershipsRelationManager extends RelationManager
     }
 
     /**
+     * Get memberships with prices, lazy loading them only when needed
+     *
+     * @return EloquentCollection<int, Membership>
+     */
+    protected function getMemberships(): EloquentCollection
+    {
+        if ($this->memberships === null) {
+            $this->memberships = Membership::with('prices')->get();
+        }
+
+        return $this->memberships;
+    }
+
+    /**
      * @return Collection<int, string>
      */
     private function getMembershipOptions(): Collection
     {
-        return $this->memberships
+        return $this->getMemberships()
             ->pluck('name', 'id')
             ->mapWithKeys(fn (string $item, int $key) => [$key => Str::title($item)]);
     }
@@ -124,9 +133,10 @@ class UserMembershipsRelationManager extends RelationManager
         /** @var User $user */
         $user = $this->getOwnerRecord();
 
-        $price = $this->memberships->firstWhere('id', $value)->price[$user->gender] ?? 0;
+        $membership = $this->getMemberships()->firstWhere('id', $value);
+        $activePrice = $membership->prices()->active()->first();
 
-        return $price <= 0;
+        return ($activePrice->{$user->gender} ?? 0) <= 0;
     }
 
     private function getUserMembershipStatus(UserMembership $record): string
@@ -140,7 +150,7 @@ class UserMembershipsRelationManager extends RelationManager
      */
     private function prepareUserMembershipData(array $data): array
     {
-        $membership = $this->memberships->firstWhere('id', $data['membership_id']);
+        $membership = $this->getMemberships()->firstWhere('id', $data['membership_id']);
 
         /** @var User $user */
         $user = $this->getOwnerRecord();

@@ -22,6 +22,8 @@ class UserMembership extends Model
         'membership_price_at_joining',
         'start_date',
         'end_date',
+        'created_by',
+        'updated_by',
     ];
 
     protected $casts = [

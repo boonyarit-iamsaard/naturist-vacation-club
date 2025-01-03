@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Membership;
-use App\Models\MembershipPrice;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,22 +10,31 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('membership_prices', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedInteger('female')->default(0);
-            $table->unsignedInteger('male')->default(0);
-            $table->timestamps();
-            $table->softDeletes();
-        });
-
         Schema::create('memberships', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
             $table->string('code', 4)->unique();
-            $table->foreignIdFor(MembershipPrice::class)->unique()->constrained()->cascadeOnUpdate()->restrictOnDelete();
             $table->unsignedInteger('room_discount')->default(0)->comment('Discount percentage for room prices');
             $table->timestamps();
             $table->softDeletes();
+        });
+
+        Schema::create('membership_prices', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedInteger('female')->default(0);
+            $table->unsignedInteger('male')->default(0);
+            $table->enum('type', ['standard', 'promotion'])->default('standard');
+            $table->string('promotion_name')->nullable();
+            $table->timestamp('effective_from');
+            $table->timestamp('effective_to')->nullable();
+            $table->foreignIdFor(Membership::class)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->unique(['membership_id', 'type', 'effective_from'], 'unique_active_standard_price');
+
+            $table->index(['membership_id', 'type', 'effective_from', 'effective_to'], 'idx_membership_price_lookup');
+            $table->index(['type', 'effective_from', 'effective_to'], 'idx_price_date_range');
         });
 
         Schema::create('membership_sequences', function (Blueprint $table) {
@@ -51,9 +59,20 @@ return new class extends Migration
             $table->timestamp('end_date');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index('user_email');
+            $table->index(['start_date', 'end_date']);
+
+            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('updated_by')->nullable()->constrained('users');
+
+            $table->index(['membership_number', 'start_date', 'end_date'], 'idx_membership_number_period');
+            $table->index(['user_id', 'start_date', 'end_date'], 'idx_active_membership');
         });
 
         DB::statement('ALTER TABLE memberships ADD CONSTRAINT check_room_discount CHECK (room_discount >= 0 AND room_discount <= 100)');
+
+        DB::statement('ALTER TABLE membership_prices ADD CONSTRAINT check_prices CHECK (female >= 0 AND male >= 0)');
     }
 
     public function down(): void

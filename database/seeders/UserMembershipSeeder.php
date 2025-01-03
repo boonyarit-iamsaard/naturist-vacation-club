@@ -16,7 +16,7 @@ class UserMembershipSeeder extends Seeder
     {
         $this->command->info('Start seeding user memberships...');
 
-        $memberships = Membership::all();
+        $memberships = Membership::with('prices')->get();
 
         if ($memberships->isEmpty()) {
             $this->command->warn('No memberships found, skipping...');
@@ -26,6 +26,7 @@ class UserMembershipSeeder extends Seeder
 
         $membershipCount = $memberships->count();
         $users = User::all();
+        $admin = User::where('role', 'administrator')->first();
         $totalUsers = $users->count();
 
         if ($totalUsers < $membershipCount + 1) {
@@ -44,7 +45,8 @@ class UserMembershipSeeder extends Seeder
             $offset += $usersPerMembership;
 
             foreach ($membershipUsers as $user) {
-                $price = $membership->price[$user->gender] ?? 0;
+                $activePrice = $membership->prices()->active()->first();
+                $price = $activePrice->{$user->gender} ?? 0;
 
                 if ($price === 0) {
                     continue;
@@ -62,6 +64,8 @@ class UserMembershipSeeder extends Seeder
                     'membership_name' => $membership->name,
                     'membership_price_at_joining' => $price,
                     'start_date' => now()->subYears(2)->addMonths(6),
+                    'created_by' => $admin->id,
+                    'updated_by' => $admin->id,
                 ]);
 
                 /**
@@ -76,6 +80,8 @@ class UserMembershipSeeder extends Seeder
                     'membership_name' => $membership->name,
                     'membership_price_at_joining' => $price,
                     'start_date' => now()->subYear()->addMonths(6)->addDay(),
+                    'created_by' => $admin->id,
+                    'updated_by' => $admin->id,
                 ]);
 
                 $user->update(['role' => 'member']);
