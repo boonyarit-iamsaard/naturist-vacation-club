@@ -18,7 +18,7 @@ class MembershipSeeder extends Seeder
 
         $memberships = json_decode(Storage::get('json/memberships.json'), true);
 
-        if (is_null($memberships)) {
+        if ($memberships === null) {
             $this->command->warn('Memberships seed data not found, skipping...');
 
             return;
@@ -27,16 +27,20 @@ class MembershipSeeder extends Seeder
         $this->command->info('Seeding memberships...');
 
         foreach ($memberships as $membership) {
-            $price = MembershipPrice::create([
-                'female' => $membership['price']['female'],
-                'male' => $membership['price']['male'],
-            ]);
-
-            Membership::create([
-                'name' => $membership['name'],
+            // Create membership first
+            $membershipModel = Membership::create([
+                'name' => ucfirst($membership['name']),
                 'code' => $membership['code'],
                 'room_discount' => $membership['room_discount'],
-                'membership_price_id' => $price->id,
+            ]);
+
+            // Then create standard price for the membership
+            MembershipPrice::create([
+                'membership_id' => $membershipModel->id,
+                'female' => $membership['price']['female'],
+                'male' => $membership['price']['male'],
+                'type' => 'standard',
+                'effective_from' => now(),
             ]);
         }
 
