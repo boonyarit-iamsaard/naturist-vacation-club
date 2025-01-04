@@ -30,6 +30,8 @@ class MembershipPriceService
             'female' => $femalePrice,
             'male' => $malePrice,
             'effective_from' => $effectiveFrom,
+            'membership_name' => $membership->name,
+            'membership_code' => $membership->code,
         ]);
     }
 
@@ -63,6 +65,8 @@ class MembershipPriceService
             'male' => $malePrice,
             'effective_from' => $effectiveFrom,
             'effective_to' => $effectiveUntil,
+            'membership_name' => $membership->name,
+            'membership_code' => $membership->code,
         ]);
     }
 

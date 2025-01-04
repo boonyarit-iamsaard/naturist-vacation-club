@@ -41,6 +41,8 @@ class MembershipSeeder extends Seeder
                 'male' => $membership['price']['male'],
                 'type' => 'standard',
                 'effective_from' => now(),
+                'membership_name' => $membershipModel->name,
+                'membership_code' => $membershipModel->code,
             ]);
         }
 

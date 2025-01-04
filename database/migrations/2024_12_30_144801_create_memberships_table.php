@@ -27,7 +27,9 @@ return new class extends Migration
             $table->string('promotion_name')->nullable();
             $table->timestamp('effective_from');
             $table->timestamp('effective_to')->nullable();
-            $table->foreignIdFor(Membership::class)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignIdFor(Membership::class)->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
+            $table->string('membership_name');
+            $table->string('membership_code');
             $table->timestamps();
             $table->softDeletes();
 
