@@ -72,7 +72,9 @@ class MembershipPriceService
 
     public function getCurrentPrice(Membership $membership): MembershipPrice
     {
-        // First check for active promotions
+        /**
+         * Current promotion price
+         */
         $promotionalPrice = $membership->prices()
             ->promotional()
             ->active()
@@ -82,7 +84,9 @@ class MembershipPriceService
             return $promotionalPrice;
         }
 
-        // Fall back to standard price
+        /**
+         * Fall back to standard price
+         */
         return $membership->prices()
             ->standard()
             ->active()
@@ -98,7 +102,7 @@ class MembershipPriceService
      *     female_price: int,
      *     male_price: int,
      *     effective_from: string,
-     *     effective_until: string|null,
+     *     effective_to: string|null,
      *     status: MembershipPriceStatus
      * }>
      */
@@ -115,10 +119,25 @@ class MembershipPriceService
                     'female_price' => $price->female,
                     'male_price' => $price->male,
                     'effective_from' => $price->effective_from->format('Y-m-d H:i:s'),
-                    'effective_until' => $price->effective_to?->format('Y-m-d H:i:s'),
+                    'effective_to' => $price->effective_to?->format('Y-m-d H:i:s'),
                     'status' => $this->getPriceStatus($price),
                 ];
             });
+    }
+
+    public function getPriceStatus(MembershipPrice $price): MembershipPriceStatus
+    {
+        $now = now();
+
+        if ($price->effective_to && $price->effective_to->lte($now)) {
+            return MembershipPriceStatus::Expired;
+        }
+
+        if ($price->effective_from->gt($now)) {
+            return MembershipPriceStatus::Future;
+        }
+
+        return MembershipPriceStatus::Active;
     }
 
     private function validateNoOverlappingPromotions(
@@ -137,21 +156,6 @@ class MembershipPriceService
         if ($overlapping) {
             throw new InvalidArgumentException('Another promotion already exists during this period');
         }
-    }
-
-    private function getPriceStatus(MembershipPrice $price): MembershipPriceStatus
-    {
-        $now = now();
-
-        if ($price->effective_to && $price->effective_to->lte($now)) {
-            return MembershipPriceStatus::Expired;
-        }
-
-        if ($price->effective_from->gt($now)) {
-            return MembershipPriceStatus::Future;
-        }
-
-        return MembershipPriceStatus::Active;
     }
 
     private function handleOverlappingStandardPrices(

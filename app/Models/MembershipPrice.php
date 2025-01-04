@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use InvalidArgumentException;
 
 class MembershipPrice extends Model
 {
@@ -15,6 +16,8 @@ class MembershipPrice extends Model
 
     protected $fillable = [
         'membership_id',
+        'membership_name',
+        'membership_code',
         'type',
         'promotion_name',
         'effective_from',
@@ -34,7 +37,26 @@ class MembershipPrice extends Model
     {
         parent::boot();
 
-        // TODO: implement creating and updating validation
+        // TODO: implement full validation
+        // TODO: take effective time into account
+        // TODO: set app level configuration for the date format
+        // TODO: consider move business logic to a service layer
+
+        static::creating(function ($membershipPrice) {
+            $previousStandardPrice = $membershipPrice->membership->prices()->standard()->latest()->first();
+            $previousPromotionalPrice = $membershipPrice->membership->prices()->promotional()->latest()->first();
+
+            if ($previousStandardPrice && $membershipPrice->type === 'standard') {
+                $previousStandardPrice->effective_to = $membershipPrice->effective_from->subDay()->format('Y-m-d');
+                $previousStandardPrice->save();
+            }
+
+            if ($previousPromotionalPrice && $membershipPrice->type === 'promotion') {
+                if (! $membershipPrice->effective_from->isAfter($previousPromotionalPrice->effective_from)) {
+                    throw new InvalidArgumentException('Promotional price must be effective after the previous promotional price');
+                }
+            }
+        });
 
         static::deleting(function ($membershipPrice) {
             /**
