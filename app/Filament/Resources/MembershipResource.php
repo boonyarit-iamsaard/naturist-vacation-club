@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\MembershipResource\Pages\CreateMembership;
 use App\Filament\Resources\MembershipResource\Pages\EditMembership;
 use App\Filament\Resources\MembershipResource\Pages\ListMemberships;
+use App\Filament\Resources\MembershipResource\RelationManagers\PricesRelationManager;
 use App\Models\Membership;
 use Exception;
 use Filament\Forms\Components\TextInput;
@@ -111,7 +112,7 @@ class MembershipResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            PricesRelationManager::class,
         ];
     }
 
