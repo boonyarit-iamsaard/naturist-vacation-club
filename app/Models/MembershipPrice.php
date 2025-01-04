@@ -43,33 +43,17 @@ class MembershipPrice extends Model
         // TODO: consider move business logic to a service layer
 
         static::creating(function ($membershipPrice) {
-            $previousStandardPrice = $membershipPrice->membership->prices()->standard()->latest()->first();
-            $previousPromotionalPrice = $membershipPrice->membership->prices()->promotional()->latest()->first();
-
-            if ($previousStandardPrice && $membershipPrice->type === 'standard') {
-                $previousStandardPrice->effective_to = $membershipPrice->effective_from->subDay()->format('Y-m-d');
-                $previousStandardPrice->save();
+            if ($membershipPrice->type === 'standard') {
+                $membershipPrice->handleStandardPriceCreation();
             }
 
-            if ($previousPromotionalPrice && $membershipPrice->type === 'promotion') {
-                if (! $membershipPrice->effective_from->isAfter($previousPromotionalPrice->effective_from)) {
-                    throw new InvalidArgumentException('Promotional price must be effective after the previous promotional price');
-                }
+            if ($membershipPrice->type === 'promotion') {
+                $membershipPrice->validatePromotionalPriceCreation();
             }
         });
 
         static::deleting(function ($membershipPrice) {
-            /**
-             * Prevent deletion of standard price if it causes the membership to have no standard prices.
-             */
-            $remainingStandardPrices = $membershipPrice->membership->prices()
-                ->standard()
-                ->whereNot('id', $membershipPrice->id)
-                ->exists();
-
-            if (! $remainingStandardPrices) {
-                throw new Exception('Cannot delete the last standard price for this membership');
-            }
+            $membershipPrice->validateDeletion();
         });
     }
 
@@ -123,5 +107,38 @@ class MembershipPrice extends Model
     public function membership(): BelongsTo
     {
         return $this->belongsTo(Membership::class);
+    }
+
+    protected function handleStandardPriceCreation(): void
+    {
+        /** @var MembershipPrice|null $previousStandardPrice */
+        $previousStandardPrice = $this->membership->prices()->standard()->latest()->first();
+
+        if ($previousStandardPrice) {
+            $previousStandardPrice->effective_to = $this->effective_from->subDay();
+            $previousStandardPrice->save();
+        }
+    }
+
+    protected function validatePromotionalPriceCreation(): void
+    {
+        $previousPromotionalPrice = $this->membership->prices()->promotional()->latest()->first();
+
+        if ($previousPromotionalPrice && ! $this->effective_from->isAfter($previousPromotionalPrice->effective_from)) {
+            throw new InvalidArgumentException('Promotional price must be effective after the previous promotional price');
+        }
+    }
+
+    protected function validateDeletion(): void
+    {
+        $remainingStandardPrices = $this->membership->prices()
+            ->standard()
+            ->active()
+            ->whereNot('id', $this->id)
+            ->exists();
+
+        if (! $remainingStandardPrices) {
+            throw new Exception('Cannot delete the last active standard price for this membership');
+        }
     }
 }

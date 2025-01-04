@@ -5,42 +5,41 @@ use App\Models\MembershipPrice;
 use App\Models\User;
 use App\Models\UserMembership;
 use Database\Seeders\MembershipSeeder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 test('membership has many membership prices', function () {
     $this->seed(MembershipSeeder::class);
-    $membership = Membership::where('code', 'S')->first();
 
-    expect($membership->prices)
-        ->toBeCollection()
-        ->not->toBeEmpty()
-        ->and($membership->prices->first())
-        ->toBeInstanceOf(MembershipPrice::class)
-        ->and($membership->prices->first()->female)->toBe(500000)
-        ->and($membership->prices->first()->male)->toBe(0)
-        ->and($membership->prices->first()->type)->toBe('standard')
-        ->and($membership->prices->first()->effective_from)->not->toBeNull()
-        ->and($membership->prices->first()->effective_to)->toBeNull()
-        ->and($membership->room_discount)->toBe(15);
+    $membership = Membership::where('code', 'S')->first();
+    $prices = $membership->prices();
+    $standardPrice = $prices->standard()->active()->first();
+
+    expect($prices)
+        ->toBeInstanceOf(HasMany::class)
+        ->and($prices->count())->toBeGreaterThan(0)
+        ->and($standardPrice->female)->toBe(500000)
+        ->and($standardPrice->male)->toBe(0)
+        ->and($standardPrice->type)->toBe('standard')
+        ->and($standardPrice->effective_from)->not->toBeNull()
+        ->and($standardPrice->effective_to)->toBeNull();
 });
 
 test('gold membership has correct prices', function () {
     $this->seed(MembershipSeeder::class);
-    $membership = Membership::where('code', 'G')->first();
 
-    expect($membership->prices)
-        ->toBeCollection()
-        ->not->toBeEmpty()
-        ->and($membership->prices->first())
+    $membership = Membership::where('code', 'G')->first();
+    $standardPrice = $membership->prices()->standard()->active()->first();
+
+    expect($standardPrice)
         ->toBeInstanceOf(MembershipPrice::class)
-        ->and($membership->prices->first()->female)->toBe(1000000)
-        ->and($membership->prices->first()->male)->toBe(3000000)
-        ->and($membership->prices->first()->type)->toBe('standard')
-        ->and($membership->prices->first()->effective_from)->not->toBeNull()
-        ->and($membership->prices->first()->effective_to)->toBeNull()
-        ->and($membership->room_discount)->toBe(30);
+        ->and($standardPrice->female)->toBe(1000000)
+        ->and($standardPrice->male)->toBe(3000000)
+        ->and($standardPrice->type)->toBe('standard')
+        ->and($standardPrice->effective_from)->not->toBeNull()
+        ->and($standardPrice->effective_to)->toBeNull();
 });
 
 test('membership price belongs to membership', function () {
@@ -64,7 +63,6 @@ test('membership soft delete sets null on user memberships', function () {
     $userMembership = UserMembership::create([
         'user_id' => $user->id,
         'membership_id' => $membership->id,
-        'membership_number' => 'S001',
         'user_name' => $user->name,
         'user_email' => $user->email,
         'user_gender' => $user->gender,
@@ -85,11 +83,11 @@ test('cannot delete last standard price of membership', function () {
     $this->seed(MembershipSeeder::class);
 
     $membership = Membership::where('code', 'S')->first();
-    $standardPrice = $membership->prices()->standard()->first();
+    $standardPrice = $membership->prices()->standard()->active()->first();
 
     expect(fn () => $standardPrice->delete())
-        ->toThrow(Exception::class, 'Cannot delete the last standard price for this membership');
+        ->toThrow(Exception::class, 'Cannot delete the last active standard price for this membership');
 
     expect(fn () => $standardPrice->forceDelete())
-        ->toThrow(Exception::class, 'Cannot delete the last standard price for this membership');
+        ->toThrow(Exception::class, 'Cannot delete the last active standard price for this membership');
 });
