@@ -2,7 +2,7 @@
 
 namespace App\Services\Membership;
 
-use App\Enums\MembershipPriceStatus;
+use App\Enums\PriceStatus;
 use App\Enums\PriceType;
 use App\Models\Membership;
 use App\Models\MembershipPrice;
@@ -104,7 +104,7 @@ class MembershipPriceService
      *     male_price: int,
      *     effective_from: string,
      *     effective_to: string|null,
-     *     status: MembershipPriceStatus
+     *     status: PriceStatus
      * }>
      */
     public function getPriceHistory(Membership $membership): Collection
@@ -126,19 +126,19 @@ class MembershipPriceService
             });
     }
 
-    public function getPriceStatus(MembershipPrice $price): MembershipPriceStatus
+    public function getPriceStatus(MembershipPrice $price): PriceStatus
     {
         $now = now();
 
         if ($price->effective_to && $price->effective_to->lte($now)) {
-            return MembershipPriceStatus::Expired;
+            return PriceStatus::Expired;
         }
 
         if ($price->effective_from->gt($now)) {
-            return MembershipPriceStatus::Future;
+            return PriceStatus::Future;
         }
 
-        return MembershipPriceStatus::Active;
+        return PriceStatus::Active;
     }
 
     private function validateNoOverlappingPromotions(

@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum MembershipPriceStatus: string
+enum PriceStatus: string
 {
     case Active = 'active';
     case Expired = 'expired';
