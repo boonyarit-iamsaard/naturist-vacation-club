@@ -2,13 +2,15 @@
 
 namespace App\Enums;
 
-enum PriceStatus: string
+use Filament\Support\Contracts\HasLabel;
+
+enum PriceStatus: string implements HasLabel
 {
     case Active = 'active';
     case Expired = 'expired';
     case Future = 'future';
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::Active => 'Active',

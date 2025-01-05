@@ -46,18 +46,15 @@ class PricesRelationManager extends RelationManager
                     ->disabled()
                     ->default($membership->code),
                 Select::make('type')
-                    ->options([
-                        'standard' => 'Standard',
-                        'promotion' => 'Promotion',
-                    ])
+                    ->options(PriceType::class)
                     ->live(onBlur: true)
-                    ->afterStateUpdated(fn (Set $set, Get $get) => $get('type') === 'standard' ? $set('effective_to', null) : null)
+                    ->afterStateUpdated(fn (Set $set, ?string $state) => $state === PriceType::Standard->value ? $set('effective_to', null) : null)
                     ->native(false)
                     ->required(),
                 TextInput::make('promotion_name')
                     ->helperText('This is only required if the price is a promotion')
                     ->maxLength(255)
-                    ->requiredIf('type', 'promotion'),
+                    ->requiredIf('type', PriceType::Promotion->value),
                 TextInput::make('female')
                     ->label('Female Price')
                     ->numeric()
@@ -84,10 +81,10 @@ class PricesRelationManager extends RelationManager
                     ->displayFormat(static::$displayDateFormat)
                     ->format(static::$dateFormat)
                     ->minDate(fn (Get $get) => Carbon::parse($get('effective_from'))->addDay()->format(static::$dateFormat))
-                    ->disabled(fn (Get $get) => $get('type') === 'standard')
+                    ->disabled(fn (Get $get) => $get('type') === PriceType::Standard->value)
                     ->live(onBlur: true)
                     ->native(false)
-                    ->requiredIf('type', 'promotion'),
+                    ->requiredIf('type', PriceType::Promotion->value),
             ]);
     }
 
@@ -97,7 +94,7 @@ class PricesRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('type')
                     ->badge()
-                    ->formatStateUsing(fn (PriceType $state) => $state->label()),
+                    ->formatStateUsing(fn (PriceType $state) => $state->getLabel()),
                 TextColumn::make('female')
                     ->formatStateUsing(fn (string $state) => (int) $state === 0 ? 'N/A' : number_format((int) $state / 100)),
                 TextColumn::make('male')
@@ -110,8 +107,7 @@ class PricesRelationManager extends RelationManager
                     ->label('Effective To')
                     ->dateTime(static::$displayDateFormat)
                     ->sortable(),
-                TextColumn::make('active')
-                    ->label('Status')
+                TextColumn::make('status')
                     ->badge()
                     ->getStateUsing(fn (MembershipPrice $record) => $this->getPriceStatus($record)),
             ])
@@ -138,7 +134,7 @@ class PricesRelationManager extends RelationManager
 
     private function getPriceStatus(MembershipPrice $record): string
     {
-        return app(MembershipPriceService::class)->getPriceStatus($record)->label();
+        return app(MembershipPriceService::class)->getPriceStatus($record)->getLabel();
     }
 
     /**

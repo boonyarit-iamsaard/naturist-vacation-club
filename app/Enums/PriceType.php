@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum PriceType: string
+use Filament\Support\Contracts\HasLabel;
+
+enum PriceType: string implements HasLabel
 {
     case Standard = 'standard';
     case Promotion = 'promotion';
@@ -15,7 +17,7 @@ enum PriceType: string
         return array_column(self::cases(), 'value');
     }
 
-    public function label(): string
+    public function getLabel(): string
     {
         return match ($this) {
             self::Standard => 'Standard',
