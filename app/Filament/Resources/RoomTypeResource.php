@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\RoomTypeResource\Pages\CreateRoomType;
 use App\Filament\Resources\RoomTypeResource\Pages\EditRoomType;
 use App\Filament\Resources\RoomTypeResource\Pages\ListRoomTypes;
-use App\Filament\Resources\RoomTypeResource\RelationManagers\RoomsRelationManager;
+use App\Filament\Resources\RoomTypeResource\RelationManagers\RoomTypePricesRelationManager;
 use App\Models\RoomType;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -101,7 +101,7 @@ class RoomTypeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RoomsRelationManager::class,
+            RoomTypePricesRelationManager::class,
         ];
     }
 

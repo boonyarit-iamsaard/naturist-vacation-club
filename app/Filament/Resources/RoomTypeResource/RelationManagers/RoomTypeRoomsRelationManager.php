@@ -15,7 +15,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class RoomsRelationManager extends RelationManager
+class RoomTypeRoomsRelationManager extends RelationManager
 {
     protected static string $relationship = 'rooms';
 
