@@ -42,14 +42,6 @@ class Membership extends Model
     }
 
     /**
-     * @return HasOne<MembershipPrice, covariant Membership>
-     */
-    public function activeStandardPrice(): HasOne
-    {
-        return $this->hasOne(MembershipPrice::class)->active()->standard();
-    }
-
-    /**
      * @return HasMany<MembershipPrice, covariant Membership>
      */
     public function prices(): HasMany
