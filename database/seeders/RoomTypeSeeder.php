@@ -37,12 +37,61 @@ class RoomTypeSeeder extends Seeder
                 'description' => $roomType['description'],
             ]);
 
+            /**
+             * This is the previous standard price for the room type
+             *
+             * TODO: add a condition to run only in development environment
+             */
+            RoomPrice::create([
+                'room_type_id' => $createdRoomType->id,
+                'weekday' => $roomType['price']['weekday'],
+                'weekend' => $roomType['price']['weekend'],
+                'type' => PriceType::Standard,
+                'effective_from' => now()->subMonth()->format($dateFormat),
+                'room_type_name' => $createdRoomType->name,
+                'room_type_code' => $createdRoomType->code,
+            ]);
+
             RoomPrice::create([
                 'room_type_id' => $createdRoomType->id,
                 'weekday' => $roomType['price']['weekday'],
                 'weekend' => $roomType['price']['weekend'],
                 'type' => PriceType::Standard,
                 'effective_from' => now()->format($dateFormat),
+                'room_type_name' => $createdRoomType->name,
+                'room_type_code' => $createdRoomType->code,
+            ]);
+
+            /**
+             * This is the expired promotion price for the room type
+             *
+             * TODO: add a condition to run only in development environment
+             */
+            RoomPrice::create([
+                'room_type_id' => $createdRoomType->id,
+                'weekday' => $roomType['price']['weekday'] * 0.9,
+                'weekend' => $roomType['price']['weekend'] * 0.9,
+                'type' => PriceType::Promotion,
+                'promotion_name' => 'Promotion 1',
+                'effective_from' => now()->subMonth()->subWeeks(2)->format($dateFormat),
+                'effective_to' => now()->subMonth()->format($dateFormat),
+                'room_type_name' => $createdRoomType->name,
+                'room_type_code' => $createdRoomType->code,
+            ]);
+
+            /**
+             * This is the future promotion price for the room type
+             *
+             * TODO: add a condition to run only in development environment
+             */
+            RoomPrice::create([
+                'room_type_id' => $createdRoomType->id,
+                'weekday' => $roomType['price']['weekday'] * 0.9,
+                'weekend' => $roomType['price']['weekend'] * 0.9,
+                'type' => PriceType::Promotion,
+                'promotion_name' => 'Promotion 2',
+                'effective_from' => now()->addMonth()->format($dateFormat),
+                'effective_to' => now()->addMonth()->addWeeks(2)->format($dateFormat),
                 'room_type_name' => $createdRoomType->name,
                 'room_type_code' => $createdRoomType->code,
             ]);
