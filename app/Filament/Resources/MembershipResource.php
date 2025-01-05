@@ -73,13 +73,15 @@ class MembershipResource extends Resource
                     ->label('Room Discount (%)')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('activeStandardPrice.female')
-                    ->label('Female')
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 100) : 'N/A')
+                TextColumn::make('female')
+                    ->label('Female Price')
+                    ->getStateUsing(fn (Membership $record) => $record->prices()->standard()->active()->first()->female)
+                    ->formatStateUsing(fn (string $state) => (int) $state === 0 ? 'N/A' : number_format((int) $state / 100))
                     ->sortable(),
-                TextColumn::make('activeStandardPrice.male')
-                    ->label('Male')
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 100) : 'N/A')
+                TextColumn::make('male')
+                    ->label('Male Price')
+                    ->getStateUsing(fn (Membership $record) => $record->prices()->standard()->active()->first()->male)
+                    ->formatStateUsing(fn (string $state) => (int) $state === 0 ? 'N/A' : number_format((int) $state / 100))
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
@@ -94,6 +96,7 @@ class MembershipResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('room_discount', 'desc')
             ->filters([
                 TrashedFilter::make(),
             ])
