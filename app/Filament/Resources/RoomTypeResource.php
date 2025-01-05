@@ -6,6 +6,7 @@ use App\Filament\Resources\RoomTypeResource\Pages\CreateRoomType;
 use App\Filament\Resources\RoomTypeResource\Pages\EditRoomType;
 use App\Filament\Resources\RoomTypeResource\Pages\ListRoomTypes;
 use App\Filament\Resources\RoomTypeResource\RelationManagers\RoomTypePricesRelationManager;
+use App\Filament\Resources\RoomTypeResource\RelationManagers\RoomTypeRoomsRelationManager;
 use App\Models\RoomType;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -102,6 +103,7 @@ class RoomTypeResource extends Resource
     {
         return [
             RoomTypePricesRelationManager::class,
+            RoomTypeRoomsRelationManager::class,
         ];
     }
 
