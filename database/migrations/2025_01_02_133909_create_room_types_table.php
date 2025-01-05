@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\RoomPrice;
+use App\Enums\PriceType;
 use App\Models\RoomType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -10,28 +10,41 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('room_prices', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedInteger('weekday');
-            $table->unsignedInteger('weekend');
-            $table->timestamps();
-            $table->softDeletes();
-        });
-
         Schema::create('room_types', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('code', 4)->unique();
             $table->text('description')->nullable();
-            $table->foreignIdFor(RoomPrice::class)->constrained()->cascadeOnUpdate()->restrictOnDelete();
             $table->timestamps();
             $table->softDeletes();
+        });
+
+        Schema::create('room_prices', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedInteger('weekday');
+            $table->unsignedInteger('weekend');
+            $table->enum('type', PriceType::all())->default(PriceType::Standard);
+            $table->string('promotion_name')->nullable();
+            $table->timestamp('effective_from');
+            $table->timestamp('effective_to')->nullable();
+            $table->foreignIdFor(RoomType::class)->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
+            $table->string('room_type_name');
+            $table->string('room_type_code');
+            $table->timestamps();
+            $table->softDeletes();
+
+            $table->unique(['room_type_id', 'type', 'effective_from'], 'unique_active_standard_price');
+
+            $table->index(['room_type_id', 'type', 'effective_from', 'effective_to'], 'idx_room_price_lookup');
+            $table->index(['type', 'effective_from', 'effective_to'], 'idx_price_date_range');
         });
 
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->foreignIdFor(RoomType::class)->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignIdFor(RoomType::class)->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
+            $table->string('room_type_name');
+            $table->string('room_type_code');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -31,16 +31,16 @@ class RoomTypeController extends Controller
      * @property-read string $name
      * @property-read string $code
      * @property-read string $description
-     * @property-read int $room_price_weekday
-     * @property-read int $room_price_weekend
+     * @property-read int $prices_weekday
+     * @property-read int $prices_weekend
      */
     private function getRoomTypes(): Collection
     {
         return RoomType::query()
             ->with(['rooms'])
-            ->withAggregate('roomPrice', 'weekday')
-            ->withAggregate('roomPrice', 'weekend')
-            ->orderByDesc('room_price_weekday')
+            ->withAggregate(['prices' => fn ($query) => $query->standard()->active()], 'weekday')
+            ->withAggregate(['prices' => fn ($query) => $query->standard()->active()], 'weekend')
+            ->orderByDesc('prices_weekday')
             ->get();
     }
 }

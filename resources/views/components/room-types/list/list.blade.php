@@ -8,8 +8,8 @@
         <x-room-types.list.item
             :name="$roomType->name"
             :description="$roomType->description"
-            :weekdayPrice="$roomType->room_price_weekday"
-            :weekendPrice="$roomType->room_price_weekend"
+            :weekdayPrice="$roomType->prices_weekday"
+            :weekendPrice="$roomType->prices_weekend"
             :maxDiscount="$maxDiscount"
         />
     @endforeach

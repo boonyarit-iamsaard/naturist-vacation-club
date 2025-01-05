@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -15,15 +14,18 @@ class RoomType extends Model
         'name',
         'code',
         'description',
-        'room_price_id',
+    ];
+
+    protected $casts = [
+        'room_price_id' => 'integer',
     ];
 
     /**
-     * @return BelongsTo<RoomPrice, covariant RoomType>
+     * @return HasMany<RoomPrice, covariant RoomType>
      */
-    public function roomPrice(): BelongsTo
+    public function prices(): HasMany
     {
-        return $this->belongsTo(RoomPrice::class);
+        return $this->hasMany(RoomPrice::class);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PriceType;
 use App\Models\Room;
 use App\Models\RoomPrice;
 use App\Models\RoomType;
@@ -27,23 +28,31 @@ class RoomTypeSeeder extends Seeder
 
         $this->command->info('Seeding room types...');
 
-        foreach ($roomTypes as $roomType) {
-            $roomPrice = RoomPrice::create([
-                'weekday' => $roomType['price']['weekday'],
-                'weekend' => $roomType['price']['weekend'],
-            ]);
+        $dateFormat = 'Y-m-d';
 
+        foreach ($roomTypes as $roomType) {
             $createdRoomType = RoomType::create([
                 'name' => $roomType['name'],
                 'code' => $roomType['code'],
                 'description' => $roomType['description'],
-                'room_price_id' => $roomPrice->id,
+            ]);
+
+            RoomPrice::create([
+                'room_type_id' => $createdRoomType->id,
+                'weekday' => $roomType['price']['weekday'],
+                'weekend' => $roomType['price']['weekend'],
+                'type' => PriceType::Standard,
+                'effective_from' => now()->format($dateFormat),
+                'room_type_name' => $createdRoomType->name,
+                'room_type_code' => $createdRoomType->code,
             ]);
 
             for ($i = 1; $i <= $roomType['quantity']; $i++) {
                 Room::create([
                     'name' => "{$createdRoomType->code}{$i}",
                     'room_type_id' => $createdRoomType->id,
+                    'room_type_name' => $createdRoomType->name,
+                    'room_type_code' => $createdRoomType->code,
                 ]);
             }
         }
