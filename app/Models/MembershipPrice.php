@@ -114,7 +114,7 @@ class MembershipPrice extends Model
     protected function handleStandardPriceCreation(): void
     {
         /** @var MembershipPrice|null $previousStandardPrice */
-        $previousStandardPrice = $this->membership->prices()->standard()->latest()->first();
+        $previousStandardPrice = $this->membership->prices()->standard()->active()->first();
 
         if ($previousStandardPrice) {
             $previousStandardPrice->effective_to = $this->effective_from->subDay();
