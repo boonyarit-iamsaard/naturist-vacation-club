@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PriceType;
 use App\Models\Membership;
 use App\Models\MembershipPrice;
 use App\Models\User;
@@ -22,7 +23,7 @@ test('membership has many membership prices', function () {
         ->and($prices->count())->toBeGreaterThan(0)
         ->and($standardPrice->female)->toBe(500000)
         ->and($standardPrice->male)->toBe(0)
-        ->and($standardPrice->type)->toBe('standard')
+        ->and($standardPrice->type)->toBe(PriceType::Standard)
         ->and($standardPrice->effective_from)->not->toBeNull()
         ->and($standardPrice->effective_to)->toBeNull();
 });
@@ -37,7 +38,7 @@ test('gold membership has correct prices', function () {
         ->toBeInstanceOf(MembershipPrice::class)
         ->and($standardPrice->female)->toBe(1000000)
         ->and($standardPrice->male)->toBe(3000000)
-        ->and($standardPrice->type)->toBe('standard')
+        ->and($standardPrice->type)->toBe(PriceType::Standard)
         ->and($standardPrice->effective_from)->not->toBeNull()
         ->and($standardPrice->effective_to)->toBeNull();
 });

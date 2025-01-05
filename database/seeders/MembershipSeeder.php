@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PriceType;
 use App\Models\Membership;
 use App\Models\MembershipPrice;
 use Illuminate\Database\Seeder;
@@ -47,7 +48,7 @@ class MembershipSeeder extends Seeder
                 'membership_id' => $membershipModel->id,
                 'female' => $membership['price']['female'],
                 'male' => $membership['price']['male'],
-                'type' => 'standard',
+                'type' => PriceType::Standard,
                 'effective_from' => now()->subMonth()->format($dateFormat),
                 'membership_name' => $membershipModel->name,
                 'membership_code' => $membershipModel->code,
@@ -60,7 +61,7 @@ class MembershipSeeder extends Seeder
                 'membership_id' => $membershipModel->id,
                 'female' => $membership['price']['female'],
                 'male' => $membership['price']['male'],
-                'type' => 'standard',
+                'type' => PriceType::Standard,
                 'effective_from' => now()->format($dateFormat),
                 'membership_name' => $membershipModel->name,
                 'membership_code' => $membershipModel->code,
@@ -75,7 +76,7 @@ class MembershipSeeder extends Seeder
                 'membership_id' => $membershipModel->id,
                 'female' => $membership['price']['female'] * 0.9,
                 'male' => $membership['price']['male'] * 0.9,
-                'type' => 'promotion',
+                'type' => PriceType::Promotion,
                 'promotion_name' => 'Promotion 1',
                 'effective_from' => now()->subMonth()->subWeeks(2)->format($dateFormat),
                 'effective_to' => now()->subMonth()->format($dateFormat),
@@ -92,7 +93,7 @@ class MembershipSeeder extends Seeder
                 'membership_id' => $membershipModel->id,
                 'female' => $membership['price']['female'] * 0.9,
                 'male' => $membership['price']['male'] * 0.9,
-                'type' => 'promotion',
+                'type' => PriceType::Promotion,
                 'promotion_name' => 'Promotion 2',
                 'effective_from' => now()->addMonth()->format($dateFormat),
                 'effective_to' => now()->addMonth()->addWeeks(2)->format($dateFormat),

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MembershipResource\RelationManagers;
 
+use App\Enums\PriceType;
 use App\Models\Membership;
 use App\Models\MembershipPrice;
 use App\Services\Membership\MembershipPriceService;
@@ -20,7 +21,6 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class PricesRelationManager extends RelationManager
 {
@@ -97,7 +97,7 @@ class PricesRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('type')
                     ->badge()
-                    ->formatStateUsing(fn (string $state) => Str::title($state)),
+                    ->formatStateUsing(fn (PriceType $state) => $state->label()),
                 TextColumn::make('female')
                     ->formatStateUsing(fn (string $state) => (int) $state === 0 ? 'N/A' : number_format((int) $state / 100)),
                 TextColumn::make('male')

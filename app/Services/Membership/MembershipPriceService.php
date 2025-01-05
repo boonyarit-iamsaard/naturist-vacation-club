@@ -3,6 +3,7 @@
 namespace App\Services\Membership;
 
 use App\Enums\MembershipPriceStatus;
+use App\Enums\PriceType;
 use App\Models\Membership;
 use App\Models\MembershipPrice;
 use Carbon\Carbon;
@@ -26,7 +27,7 @@ class MembershipPriceService
 
         return MembershipPrice::create([
             'membership_id' => $membership->id,
-            'type' => 'standard',
+            'type' => PriceType::Standard,
             'female' => $femalePrice,
             'male' => $malePrice,
             'effective_from' => $effectiveFrom,
@@ -59,7 +60,7 @@ class MembershipPriceService
 
         return MembershipPrice::create([
             'membership_id' => $membership->id,
-            'type' => 'promotion',
+            'type' => PriceType::Promotion,
             'promotion_name' => $promotionName,
             'female' => $femalePrice,
             'male' => $malePrice,
@@ -97,7 +98,7 @@ class MembershipPriceService
      * @param  Membership  $membership  The membership to get price history for
      * @return Collection<int, covariant array{
      *     id: int,
-     *     type: string,
+     *     type: PriceType,
      *     promotion_name: string|null,
      *     female_price: int,
      *     male_price: int,

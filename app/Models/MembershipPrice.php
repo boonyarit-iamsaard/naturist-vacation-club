@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PriceType;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,6 +28,7 @@ class MembershipPrice extends Model
     ];
 
     protected $casts = [
+        'type' => PriceType::class,
         'effective_from' => 'datetime',
         'effective_to' => 'datetime',
         'female' => 'integer',
@@ -43,11 +45,11 @@ class MembershipPrice extends Model
         // TODO: consider move business logic to a service layer
 
         static::creating(function ($membershipPrice) {
-            if ($membershipPrice->type === 'standard') {
+            if ($membershipPrice->type === PriceType::Standard) {
                 $membershipPrice->handleStandardPriceCreation();
             }
 
-            if ($membershipPrice->type === 'promotion') {
+            if ($membershipPrice->type === PriceType::Promotion) {
                 $membershipPrice->validatePromotionalPriceCreation();
             }
         });
@@ -63,7 +65,7 @@ class MembershipPrice extends Model
      */
     public function scopeStandard(Builder $query): Builder
     {
-        return $query->where('type', 'standard');
+        return $query->where('type', PriceType::Standard);
     }
 
     /**
@@ -72,7 +74,7 @@ class MembershipPrice extends Model
      */
     public function scopePromotional(Builder $query): Builder
     {
-        return $query->where('type', 'promotion');
+        return $query->where('type', PriceType::Promotion);
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PriceType;
 use App\Models\Membership;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
@@ -23,7 +24,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('female')->default(0);
             $table->unsignedInteger('male')->default(0);
-            $table->enum('type', ['standard', 'promotion'])->default('standard');
+            $table->enum('type', PriceType::all())->default(PriceType::Standard);
             $table->string('promotion_name')->nullable();
             $table->timestamp('effective_from');
             $table->timestamp('effective_to')->nullable();
