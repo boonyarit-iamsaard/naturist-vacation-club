@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\RoomTypeResource\Pages\CreateRoomType;
 use App\Filament\Resources\RoomTypeResource\Pages\EditRoomType;
 use App\Filament\Resources\RoomTypeResource\Pages\ListRoomTypes;
+use App\Filament\Resources\RoomTypeResource\RelationManagers\RoomsRelationManager;
 use App\Models\RoomType;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -39,7 +40,7 @@ class RoomTypeResource extends Resource
                     ->required()
                     ->maxLength(4),
                 Textarea::make('description')
-                    ->rows(10)
+                    ->rows(4)
                     ->columnSpanFull(),
             ]);
     }
@@ -100,7 +101,7 @@ class RoomTypeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RoomsRelationManager::class,
         ];
     }
 
