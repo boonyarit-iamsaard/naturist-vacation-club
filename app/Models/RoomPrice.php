@@ -113,7 +113,7 @@ class RoomPrice extends Model
     public function handleStandardPriceCreation(): void
     {
         /** @var RoomPrice|null $previousStandardPrice */
-        $previousStandardPrice = $this->roomType->prices()->standard()->latest()->first();
+        $previousStandardPrice = $this->roomType->prices()->standard()->active()->first();
 
         if ($previousStandardPrice) {
             $previousStandardPrice->effective_to = $this->effective_from->subDay();
